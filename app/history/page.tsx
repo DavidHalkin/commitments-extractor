@@ -7,8 +7,9 @@ import { formatMs, formatUsd } from "@/lib/format";
 import type { Run } from "@/lib/types";
 
 function runBadge(run: Run): string {
-  if (run.status === "done") return (run.reportStatus ?? "done").replace("_", " ");
-  return run.status;
+  if (run.status !== "done") return run.status;
+  if (run.reportStatus == null || run.reportStatus === "ok") return "done";
+  return run.reportStatus.replaceAll("_", " ");
 }
 
 export default function HistoryPage() {

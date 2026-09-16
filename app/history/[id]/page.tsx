@@ -15,29 +15,44 @@ export default function RunPage() {
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const { audioRef, playSegment } = useSegmentPlayer();
 
   useEffect(() => {
-    api<RunDetail>(`/api/runs/${id}?raw=1`).then(setDetail).catch((e: Error) => setError(e.message));
+    let cancelled = false;
     let url: string | null = null;
+    api<RunDetail>(`/api/runs/${id}?raw=1`)
+      .then((d) => {
+        if (!cancelled) setDetail(d);
+      })
+      .catch((e: Error) => {
+        if (!cancelled) setError(e.message);
+      });
     fetch(`/api/runs/${id}/audio`)
       .then((r) => (r.ok ? r.blob() : null))
       .then((b) => {
-        if (b) {
-          url = URL.createObjectURL(b);
-          setAudioUrl(url);
-        }
+        if (!b || cancelled) return;
+        url = URL.createObjectURL(b);
+        setAudioUrl(url);
       })
-      .catch(() => setAudioUrl(null));
+      .catch(() => {
+        if (!cancelled) setAudioUrl(null);
+      });
     return () => {
+      cancelled = true;
       if (url) URL.revokeObjectURL(url);
     };
   }, [id]);
 
   async function remove() {
     if (!confirm("Delete this run and its audio for everyone?")) return;
-    await api(`/api/runs/${id}`, { method: "DELETE" });
-    router.push("/history");
+    setDeleteError(null);
+    try {
+      await api(`/api/runs/${id}`, { method: "DELETE" });
+      router.push("/history");
+    } catch (e) {
+      setDeleteError((e as Error).message);
+    }
   }
 
   if (error) return <div className="banner bad">{error}</div>;
@@ -67,6 +82,7 @@ export default function RunPage() {
           <h3>Claude</h3><pre>{JSON.stringify(raw.claude, null, 2)}</pre>
         </details>
       ) : null}
+      {deleteError ? <div className="banner bad">{deleteError}</div> : null}
       <p><button type="button" onClick={() => void remove()}>Delete run</button></p>
     </div>
   );

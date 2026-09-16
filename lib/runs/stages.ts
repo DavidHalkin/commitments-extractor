@@ -74,39 +74,23 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
   run.stageStartedAt = new Date().toISOString();
   await runs.save(run); // counted write: marks this run in-flight before the paid Deepgram call
 
+  // Only the paid Deepgram call and its transcript/raw writes are allowed to land in the
+  // failure path below; a report.json/run.json write failure after that must propagate
+  // to the caller instead of being mistaken for a failed transcription (see stageExtract).
+  let outcome: Awaited<ReturnType<typeof runTranscribe>>;
   try {
-    const outcome = await runTranscribe(bytes, logTo(run));
+    outcome = await runTranscribe(bytes, logTo(run));
     Object.assign(run.stageMs, outcome.ms);
     run.file.detectedFormat = outcome.check.detectedFormat;
     run.file.mime = outcome.check.mime;
     run.file.durationSec = outcome.check.durationSec;
     run.file.hasVideo = outcome.check.hasVideo;
 
-    if (outcome.kind === "rejected") {
-      run.status = "rejected";
-      run.rejection = { code: outcome.check.code, message: outcome.check.message };
-      run.stageStartedAt = null;
-      finalizeRun(run, startedAt, 1);
-      await runs.save(run, { counted: false });
-      return run;
+    if (outcome.kind !== "rejected") {
+      run.usage.audioSeconds += outcome.transcript.durationSec;
+      await runs.putJson(run, "transcript.json", outcome.transcript);
+      await runs.putJson(run, "raw/deepgram.json", outcome.raw);
     }
-
-    run.usage.audioSeconds += outcome.transcript.durationSec;
-    await runs.putJson(run, "transcript.json", outcome.transcript);
-    await runs.putJson(run, "raw/deepgram.json", outcome.raw);
-
-    if (outcome.kind === "declined") {
-      run.status = "done";
-      run.reportStatus = "declined";
-      run.stageStartedAt = null;
-      const metrics = finalizeRun(run, startedAt, 2);
-      await runs.putJson(run, "report.json", { ...declinedReport(outcome.reasons), metrics }, { counted: false });
-      await runs.save(run, { counted: false });
-      return run;
-    }
-
-    run.status = "transcribed";
-    run.stageStartedAt = null;
   } catch (e) {
     const stage = e instanceof StageError ? e.stage : "transcribe";
     addEvent(run, stage, "failed", e instanceof Error ? e.message : String(e));
@@ -117,6 +101,28 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     await runs.save(run);
     return run;
   }
+
+  if (outcome.kind === "rejected") {
+    run.status = "rejected";
+    run.rejection = { code: outcome.check.code, message: outcome.check.message };
+    run.stageStartedAt = null;
+    finalizeRun(run, startedAt, 1);
+    await runs.save(run, { counted: false });
+    return run;
+  }
+
+  if (outcome.kind === "declined") {
+    run.status = "done";
+    run.reportStatus = "declined";
+    run.stageStartedAt = null;
+    const metrics = finalizeRun(run, startedAt, 2);
+    await runs.putJson(run, "report.json", { ...declinedReport(outcome.reasons), metrics }, { counted: false });
+    await runs.save(run, { counted: false });
+    return run;
+  }
+
+  run.status = "transcribed";
+  run.stageStartedAt = null;
   accountRequest(run, startedAt);
   await runs.save(run);
   return run;

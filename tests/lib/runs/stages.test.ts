@@ -65,10 +65,8 @@ beforeEach(() => {
   root = mkdtempSync(path.join(tmpdir(), "stages-"));
   store = new LocalStore(root);
   runs = new Runs(store);
-  vi.mocked(transcribeBytes).mockClear();
   vi.mocked(transcribeBytes).mockReset();
   vi.mocked(transcribeBytes).mockImplementation(defaultTranscribeImpl);
-  vi.mocked(extractCommitments).mockClear();
   vi.mocked(extractCommitments).mockReset();
   vi.mocked(extractCommitments).mockImplementation(defaultExtractImpl);
 });
@@ -172,5 +170,31 @@ describe("stages", () => {
 
     const { run: done } = await stageExtract(runs, staleLoaded!);
     expect(done.status).toBe("done");
+  });
+
+  it("propagates a report.json storage error on the declined path without entering the transcribe-failure path", async () => {
+    class ThrowingReportStore extends LocalStore {
+      async put(key: string, data: Uint8Array | string, contentType?: string): Promise<void> {
+        if (key.endsWith("report.json")) throw new Error("disk full");
+        return super.put(key, data, contentType);
+      }
+    }
+    const throwingRuns = new Runs(new ThrowingReportStore(root));
+
+    // Only one speaker and too few words: precheck declines it, taking the "declined" branch
+    // in stageTranscribe, which is the one that writes report.json.
+    const declinedTranscript = makeTranscript([[0, "Hi, I'm Anna, the project manager for this launch."]]);
+    vi.mocked(transcribeBytes).mockResolvedValueOnce({ transcript: declinedTranscript, raw: { metadata: { duration: 0 }, results: {} } });
+
+    const run = await uploaded("wav-renamed.mp3");
+    await expect(stageTranscribe(throwingRuns, run)).rejects.toThrow("disk full");
+
+    // The report.json write failure must not be mistaken for a failed transcription: the
+    // persisted run should still be the in-flight "transcribing" marker saved just before the
+    // (successful) Deepgram call, not a "failed"/"transcribe" run.
+    const persisted = await runs.get(run.id);
+    expect(persisted?.status).toBe("transcribing");
+    expect(persisted?.failedStage).toBeNull();
+    expect(persisted?.events.some((e) => e.stage === "transcribe" && e.type === "failed")).toBe(false);
   });
 });

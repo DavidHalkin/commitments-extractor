@@ -15,6 +15,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json(await stageExtract(runs, run));
   } catch (e) {
     if (e instanceof ConflictError) return NextResponse.json({ error: e.message }, { status: 409 });
-    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

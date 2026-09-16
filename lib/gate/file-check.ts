@@ -1,5 +1,4 @@
 import { fileTypeFromBuffer } from "file-type";
-import { parseBuffer } from "music-metadata";
 import { checkContainer, checkDuration, checkSize } from "@/lib/gate/classify";
 import { LIMITS, rejectionMessage, type RejectionCode } from "@/lib/limits";
 
@@ -56,6 +55,10 @@ export async function checkAudioFile(bytes: Uint8Array): Promise<FileCheckOk | F
   const detectedFormat = ft.ext;
   const mime = ft.mime;
 
+  // Dynamic import keeps music-metadata on Node's native ESM loader: under tsx's CommonJS
+  // transform (eval scripts) its default import of content-type, an __esModule build without
+  // `default`, resolves to undefined and every file parses as unreadable.
+  const { parseBuffer } = await import("music-metadata");
   let meta: Awaited<ReturnType<typeof parseBuffer>>;
   try {
     meta = await parseBuffer(bytes, { mimeType: mime, size: bytes.byteLength }, { duration: true });

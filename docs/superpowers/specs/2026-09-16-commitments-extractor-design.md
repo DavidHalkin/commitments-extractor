@@ -291,7 +291,6 @@ ffmpeg, expected codes written in `testset/invalid/expected.json`):
 | `too-short.mp3` — 1 s tone | `too_short` |
 | `too-large.wav` — > 35 MB | `file_too_large` |
 | `empty.mp3` — 0 bytes | `file_too_small` |
-| `truncated.mp3` — valid header, cut body | `unreadable` or accepted with duration check |
 
 These run through the server-side `file-check` in vitest (no network). The client check is
 verified manually in the browser with the same files and listed in `DELIVERY.md`.

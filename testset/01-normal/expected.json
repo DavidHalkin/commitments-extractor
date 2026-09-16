@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "items": [
+    { "anchor": ["landing page"], "kind": "task", "final_status": "not_accepted", "flags": [], "evidence_line": 3 },
+    {
+      "anchor": ["API docs", "API documentation"], "kind": "task", "final_status": "active",
+      "owner": "Mark", "owner_line": 6,
+      "deadline_contains": "Wednesday", "deadline_line": 6,
+      "flags": ["date_context_missing"], "evidence_line": [6, 17]
+    },
+    {
+      "anchor": ["client demo", "demo to Friday", "demo on Friday"], "kind": "task", "final_status": "active",
+      "owner": null,
+      "deadline_contains": "Friday", "deadline_line": [8, 9],
+      "flags": ["owner_missing", "date_context_missing"], "evidence_line": [8, 9]
+    },
+    { "anchor": ["customer survey", "the survey"], "kind": "task", "final_status": "cancelled", "flags": [], "evidence_line": 12 },
+    {
+      "anchor": ["book the room"], "kind": "task", "final_status": "active",
+      "owner": null,
+      "deadline_contains": "next Tuesday", "deadline_line": 14,
+      "flags": ["owner_missing", "date_context_missing"], "evidence_line": [13, 14]
+    },
+    { "anchor": ["budget"], "kind": "open_question", "final_status": "open", "flags": [], "evidence_line": [15, 16] }
+  ],
+  "must_not": [
+    { "anchor": ["landing page"], "final_status": "active" },
+    { "anchor": ["customer survey", "the survey"], "final_status": "active" },
+    { "anchor": ["book the room"], "has_owner": true },
+    { "anchor": ["client demo", "demo to Friday", "demo on Friday"], "deadline_contains": "Thursday" },
+    { "anchor": ["client demo", "demo to Friday", "demo on Friday"], "has_owner": true }
+  ],
+  "clarifications": [{ "about": "question", "lines": [15, 16] }]
+}

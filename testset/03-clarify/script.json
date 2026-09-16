@@ -1,0 +1,13 @@
+[
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Hi, I'm Anna, the project manager." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "And I'm Mark, the developer." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "We need to talk about the client report." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Mark, can you take the client report this time?" },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "I'm not sure I can. My week is full. Maybe you could do it?" },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "I'm not sure either. Let's see who has time." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "And when is it due? Thursday or Friday?" },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "I don't know yet. Let's decide later." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "We should probably update the roadmap too." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Maybe. Let's talk about it another time." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Okay, let's pick this up next week." }
+]

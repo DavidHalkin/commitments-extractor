@@ -1,0 +1,20 @@
+[
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Hi, I'm Anna, the project manager. Let's go through the launch plan." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Hi Anna, Mark here. I'm the developer on the team." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "First, we could also redo the landing page while we're at it." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Maybe later. Let's not add that now." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Fine. Next, the API documentation is still missing." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "I'll write the API docs by Wednesday." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Great, thanks. The client demo is on Thursday." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Actually, can we move the demo to Friday? The staging server won't be ready by Thursday." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Okay, the client demo is on Friday then." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "About the customer survey I mentioned last week. I was going to send it out." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Do we still need it? The client already gave us feedback." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Let's keep the survey anyway. I'll send it out myself." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Someone needs to book the room for the demo." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Yes, someone should book the room before next Tuesday." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "One more thing. Has the budget for the extra servers been approved?" },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "I don't know yet. Finance hasn't answered, so that's still open." },
+  { "speaker": "Mark", "voice": "aura-2-apollo-en", "text": "Okay. So the docs from me by Wednesday, and the demo on Friday." },
+  { "speaker": "Anna", "voice": "aura-2-thalia-en", "text": "Right. Thanks, Mark." }
+]

@@ -1,0 +1,13 @@
+{
+  "status": "needs_clarification",
+  "items": [],
+  "must_not": [
+    { "final_status": "active" },
+    { "has_owner": true },
+    { "has_deadline": true }
+  ],
+  "clarifications": [
+    { "about": "owner", "lines": [4, 5, 6] },
+    { "about": "deadline", "lines": [7, 8] }
+  ]
+}

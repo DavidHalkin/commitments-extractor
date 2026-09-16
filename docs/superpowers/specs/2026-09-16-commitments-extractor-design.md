@@ -217,7 +217,7 @@ settles it, and that utterance is given as `evidence` (for a corrected deadline,
 Report {
   status: "ok" | "needs_clarification" | "no_commitments" | "declined"
   declineReasons: string[]
-  clarifications: { itemSummary, question, evidence: Evidence }[]  // e.g. "Who owns 'client report'?"
+  clarifications: { about: "owner" | "deadline" | "question", itemSummary, question, evidence: Evidence }[]  // e.g. "Who owns 'client report'?"
   speakers: { speaker, name, intro: Evidence | null }[]
   items: VerifiedItem[]            // owner/deadline each with own Evidence; flags; event timeline
   dropped: { summary, reason }[]   // removed by verifier, shown in a debug section
@@ -375,24 +375,40 @@ ffmpeg concat, writes `offsets.json`.
 {
   "status": "ok",
   "items": [
-    { "anchor": "API docs", "kind": "task", "final_status": "active",
-      "owner": "Mark", "owner_line": 7,
-      "deadline_wording": "by Wednesday", "deadline_line": 7,
-      "flags": ["date_context_missing"], "evidence_line": 7 }
+    {
+      "anchor": ["API docs", "API documentation"], "kind": "task", "final_status": "active",
+      "owner": "Mark", "owner_line": 6,
+      "deadline_contains": "Wednesday", "deadline_line": 6,
+      "flags": ["date_context_missing"], "evidence_line": [6, 17]
+    }
   ],
   "must_not": [
-    { "anchor": "landing page", "final_status": "active" },
-    { "anchor": "book the room", "has_owner": true }
-  ]
+    { "anchor": ["landing page"], "final_status": "active" },
+    { "anchor": ["book the room"], "has_owner": true },
+    { "anchor": ["client demo", "demo to Friday", "demo on Friday"], "deadline_contains": "Thursday" }
+  ],
+  "clarifications": [{ "about": "question", "lines": [15, 16] }]
 }
 ```
 
-`anchor` is a short phrase from the script used **only by the eval script** to find which item
-in the app's output corresponds to an expected item: an output item matches if one of its
-verified quotes contains the anchor (normalized, ≤ 2 character edits). The app never sees anchors.
-Each `must_not` entry describes a forbidden state: the check fails if a matching item is in that
-state (e.g. "landing page" item is active, or "book the room" item has an owner). An entry
-without `anchor` applies to every output item (e.g. `{ "final_status": "active" }` in `03-clarify`).
+`anchor` is a short phrase from the script, or an array of alternative phrases, used **only by the
+eval script** to find which item in the app's output corresponds to an expected item: an output
+item matches if one of its verified quotes contains any alternative (normalized, ≤ 2 character
+edits). The app never sees anchors.
+
+- `owner_line`, `deadline_line` and `evidence_line` are 1-based script line numbers; each may be a
+  single number or an array of acceptable lines.
+- `deadline_contains` is a phrase that must occur in the kept deadline wording; `null` means the
+  item must have no deadline.
+- Each `must_not` entry describes a forbidden state: the check fails if a matching item is in that
+  state. Entries may use `final_status`, `has_owner`, `has_deadline` and `deadline_contains`. An
+  entry without `anchor` applies to every output item (e.g. `{ "final_status": "active" }` in
+  `03-clarify`).
+- `clarifications` lists required clarifications by `about` (`owner` | `deadline` | `question`);
+  one counts as found when its evidence start falls within one of the given lines (by
+  `offsets.json`). Extra clarifications are not failures.
+- Precision: extra unmatched **active** items count as failures; other unmatched items are listed
+  informationally.
 
 ### `scripts/eval.ts`
 

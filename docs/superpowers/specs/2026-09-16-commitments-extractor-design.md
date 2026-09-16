@@ -7,8 +7,8 @@ Source brief: `TS.md`
 
 A browser app where a user uploads a recorded project discussion (English, two speakers who
 introduce themselves, ≤ 3 minutes) and receives the **final state** of agreed tasks, owners,
-deadlines and unresolved questions. Every item carries timestamped verbatim quotations the user
-can play back. It is a commitments list, not a meeting summary.
+deadlines and unresolved questions. Every task, owner, deadline and unresolved question carries its
+own timestamped verbatim supporting quotation the user can play back. It is a commitments list, not a meeting summary.
 
 Hard rules from the brief:
 
@@ -17,7 +17,9 @@ Hard rules from the brief:
 - Never infer an owner or deadline that was not agreed.
 - Relative dates that cannot be resolved from the recording keep their wording and are flagged
   `date_context_missing`.
-- The product declines to conclude when the input does not allow a reliable list.
+- Where the recording does not settle an agreement, the product does not conclude it: the item is
+  reported as needing clarification, and the whole input is declined when no reliable list is
+  possible.
 
 Out of scope: calendar integration, sending tasks, accounts, microphone recording in the app,
 languages other than English, overlapping speech, asking the user for the meeting date.
@@ -29,10 +31,10 @@ languages other than English, overlapping speech, asking the user for the meetin
 | Speech-to-text | Deepgram Nova-3 (pre-recorded API, `diarize`, `utterances`, `smart_format`, `punctuate`, `language=en`) |
 | Reasoning | Claude Sonnet 5 (`claude-sonnet-5`) via tool use with a strict JSON schema, one pass |
 | Reliability | Deterministic server-side verifier: quotes, timestamps, owners, deadlines checked against the transcript |
-| Ambiguity | Flags on items + a `declined` result with reasons; no interactive clarification |
+| Ambiguity | Item flags + explicit clarification list (`needs_clarification`) + `declined` result with reasons; no interactive dialogue |
 | Stack / hosting | Next.js (App Router, TypeScript) on Vercel; Vercel Blob for client uploads |
 | Test audio | Scripts voiced with Deepgram Aura-2 (two voices), stitched with ffmpeg |
-| Test scoring | Deterministic eval script with hand-written expectations; no LLM judge |
+| Test scoring | Deterministic eval script; expectations drafted from the scripts, reviewed and corrected by the user before the first run; no LLM judge |
 
 ## 3. Architecture and data flow
 
@@ -99,9 +101,11 @@ Extraction {
     kind: "task" | "open_question"
     summary: string
     final_status: "active" | "cancelled" | "not_accepted" | "open"   // "open" only for questions
-    owner: { status: "agreed" | "none" | "disputed", name: string | null }
+    owner: { status: "agreed" | "none" | "disputed", name: string | null,
+             evidence: { utterance_id: string, quote: string } | null }  // the agreement itself
     deadline: { status: "agreed" | "none" | "disputed",
                 wording: string | null,            // verbatim, e.g. "by Friday"
+                evidence: { utterance_id: string, quote: string } | null, // latest agreed wording
                 resolved_date: string | null,      // ISO, only with an anchor in the recording
                 anchor_utterance_id: string | null }
     events: { type: "proposed" | "accepted" | "assigned" | "deadline_set" | "deadline_changed"
@@ -113,16 +117,19 @@ Extraction {
 
 The prompt instructs the model: tentative language ("we could", "maybe") is `proposed`, not
 accepted; only explicit agreement makes a task `active`; later statements override earlier ones;
-`null` rather than guessing; quotes must be copied verbatim from the given utterance.
+`null` rather than guessing; an owner or deadline is `agreed` only when a specific utterance
+settles it, and that utterance is given as `evidence` (for a corrected deadline, the correction);
+`disputed` carries the utterance that leaves it open; quotes must be copied verbatim.
 
 ### Report (returned to UI)
 
 ```ts
 Report {
-  status: "ok" | "no_commitments" | "declined"
+  status: "ok" | "needs_clarification" | "no_commitments" | "declined"
   declineReasons: string[]
+  clarifications: { itemSummary, question, evidence: Evidence }[]  // e.g. "Who owns 'client report'?"
   speakers: { speaker, name, intro: Evidence | null }[]
-  items: VerifiedItem[]            // with flags, verified evidence (start/end/speaker from STT)
+  items: VerifiedItem[]            // owner/deadline each with own Evidence; flags; event timeline
   dropped: { summary, reason }[]   // removed by verifier, shown in a debug section
   transcript: Transcript
   metrics: Metrics
@@ -143,15 +150,21 @@ Flags: "owner_missing" | "owner_disputed" | "owner_unverified" | "deadline_missi
    `active` needs `accepted` or `assigned`; `cancelled` needs `cancelled`; `not_accepted` needs
    `proposed`; `open` needs `question_raised` or `left_open`. Otherwise the item moves to `dropped`
    with the reason.
-4. **Owner.** `agreed` name must equal an identified speaker name or appear in the transcript text;
-   otherwise owner cleared and `owner_unverified`. `none` → `owner_missing`; `disputed` →
-   `owner_disputed` (the UI also lists the item under Open questions).
-5. **Deadline.** `wording` must appear (normalized) in the transcript, else cleared with
-   `deadline_unverified`. `resolved_date` is kept only if `anchor_utterance_id` exists and contains a
-   date expression; otherwise cleared. Relative wording without a kept resolved date →
-   `date_context_missing`. `none` → `deadline_missing`; `disputed` → `deadline_disputed`.
+4. **Owner.** `agreed` is kept only if `owner.evidence` passes rule 1 **and** supports the name:
+   the evidence utterance is spoken by the owner (self-commitment or acceptance, e.g. Mark: "I'll
+   take it") or its quote contains the owner's name (e.g. Anna: "Mark owns the docs"). A name merely
+   mentioned elsewhere is not enough. Otherwise the owner is cleared, flag `owner_unverified`.
+   `none` → `owner_missing`; `disputed` → `owner_disputed` plus a clarification entry.
+5. **Deadline.** `agreed` is kept only if `deadline.evidence` passes rule 1 **and** the normalized
+   `wording` occurs inside that quote. Otherwise wording is cleared, flag `deadline_unverified`.
+   `resolved_date` is kept only if `anchor_utterance_id` exists and contains a date expression;
+   otherwise cleared. Relative wording without a kept resolved date → `date_context_missing` (the
+   wording is preserved). `none` → `deadline_missing`; `disputed` → `deadline_disputed` plus a
+   clarification entry.
 6. **Speaker identity.** A speaker name is accepted only if it appears in the text of
    `intro_utterance_id` and that utterance belongs to the same speaker.
+7. **Clarifications.** Built deterministically from verified items: disputed owner, disputed
+   deadline, and `open` questions. Each entry has a question text and the evidence quote.
 
 ## 5a. Input file validation (`lib/gate/file-check.ts`)
 
@@ -186,8 +199,14 @@ Post-LLM (`verify`):
 - any speaker not identified by rule 6 → `declined` ("Speakers never introduce themselves; owners
   cannot be attributed")
 - zero verified items and `no_commitments_discussed` → `no_commitments`
+- no verified `active` task and at least one clarification → `needs_clarification` (the recording
+  discusses work but settles nothing reliably; the report lists what must be clarified and does
+  not present any commitment)
+- otherwise `ok` (clarifications, if any, are still listed)
 
-A declined report still includes transcript and metrics.
+Within the brief's scope (two speakers who introduce themselves) the `declined` rules are
+safeguards; they are covered by unit tests rather than recordings. A declined report still
+includes transcript and metrics.
 
 ## 6. UI (single page)
 
@@ -196,10 +215,14 @@ A declined report still includes transcript and metrics.
 2. **Processing:** stage list with live timings: Uploading → Transcribing → Extracting → Verifying.
 3. **Result**, titled "Final commitments":
    - Speakers with intro quote ▶.
-   - **Active tasks:** summary, Owner (or ⚠ flag), Deadline (wording, resolved date or
-     ⚠ date context missing), evidence timeline — each event shows type label, `mm:ss ▶`, speaker,
-     quote. ▶ plays exactly `start−0.3 s … end+0.3 s`.
-   - **Open questions** (includes tasks with disputed owner/deadline, cross-referenced).
+   - **Active tasks:** summary; **Owner** with its own quote `mm:ss ▶` (or ⚠ flag); **Deadline**
+     wording, resolved date or ⚠ date context missing, with its own quote `mm:ss ▶`; evidence
+     timeline — each event shows type label, `mm:ss ▶`, speaker, quote. ▶ plays exactly
+     `start−0.3 s … end+0.3 s`.
+   - **Needs clarification / Open questions:** each entry with question and quote ▶ (disputed
+     owners and deadlines, unresolved questions).
+   - **needs_clarification** state: panel "No commitment can be concluded from this recording"
+     followed by the clarification list; no task lists shown as commitments.
    - **Cancelled** (collapsed) and **Proposals not accepted** (collapsed, labelled "not a
      commitment").
    - **Dropped by verifier** (collapsed).
@@ -221,7 +244,7 @@ testset/<case>/
   script.json     # [{speaker, voice, text}] — source for synthesis
   audio.mp3       # generated by scripts/synthesize.ts
   offsets.json    # actual start/end of each line in the stitched audio
-  expected.json   # written by hand BEFORE the first run, committed separately
+  expected.json   # written BEFORE the first run, committed separately (see below)
 ```
 
 `scripts/synthesize.ts`: Aura-2 per line (two distinct voices), 0.4 s silence between lines,
@@ -233,7 +256,15 @@ ffmpeg concat, writes `offsets.json`.
 |---|---|---|
 | `01-normal` | Anna (PM) and Mark (developer) introduce themselves. Proposal never accepted ("We could also redo the landing page" → "Maybe later", topic changes). Accepted task (Mark writes the API docs by Wednesday). Corrected deadline (client demo Thursday → "actually, Friday"). Cancelled task (customer survey dropped). Task with no named owner ("someone needs to book the room"). Relative date without anchor ("next Tuesday"). Open question (budget approval unresolved). | `ok`; each item with exact status/owner/deadline/flags |
 | `02-changed` | Same script, one agreement changed: the survey is kept and Anna owns it. | Survey `active`, owner Anna; everything else identical to 01 |
-| `03-clarify` | Two speakers, no introductions, owners bounced ("you'll handle it?" / "or you?"), nothing closed. | `declined`, reason: speakers not identified |
+| `03-clarify` | Anna and Mark introduce themselves. They discuss a client report: owner bounced ("Can you take it?" / "I'm not sure I can, maybe you?"), deadline left undecided ("Thursday or Friday… let's decide later"), a vague "we should probably update the roadmap" never confirmed; the call ends without closing anything. | `needs_clarification`; clarifications for the report's owner and deadline with quotes; must_not: any `active` task, any agreed owner, any agreed deadline |
+
+### Expected list authoring (independence)
+
+1. Claude drafts `expected.json` from `script.json` only — never from app output.
+2. The user reviews the script and draft, corrects it, and approves it. The approved version is
+   committed ("expected: approved by reviewer") before any extraction run; git history shows the
+   order.
+3. Corrections made by the user are recorded in `DELIVERY.md` as the example of checking AI output.
 
 ### Expectation format
 
@@ -242,7 +273,8 @@ ffmpeg concat, writes `offsets.json`.
   "status": "ok",
   "items": [
     { "anchor": "API docs", "kind": "task", "final_status": "active",
-      "owner": "Mark", "deadline_wording": "by Wednesday",
+      "owner": "Mark", "owner_line": 7,
+      "deadline_wording": "by Wednesday", "deadline_line": 7,
       "flags": ["date_context_missing"], "evidence_line": 7 }
   ],
   "must_not": [
@@ -262,7 +294,8 @@ state (e.g. "landing page" item is active, or "book the room" item has an owner)
 
 Runs each case 3 times through `lib/pipeline.ts` and reports:
 
-- **Inclusion:** expected items found; field accuracy (status, owner, deadline wording, flags).
+- **Inclusion:** expected items found; field accuracy (status, owner, deadline wording, flags);
+  owner and deadline evidence present and matching the expected script line.
 - **Exclusion:** `must_not` checks and extra unmatched items (precision).
 - **STT vs extraction attribution:** if an anchor is absent from the transcript itself, the miss
   is labelled an STT error.
@@ -274,7 +307,9 @@ Output: `eval/results/<timestamp>.json` and `.md`. Failures are reported as they
 ### Unit tests (vitest, no network)
 
 Transcript fixtures for: quote normalization and fuzzy matching, wrong utterance id, fabricated
-quote, final-state support rule, owner/deadline verification, date anchor rule, precheck (3
+quote, final-state support rule, owner evidence (name only mentioned elsewhere → rejected;
+self-commitment → kept), deadline evidence (wording not in evidence quote → rejected; corrected
+deadline uses the correction), date anchor rule, clarification and status rules, precheck (3
 speakers, > 185 s, too few words), unidentified speaker decline.
 
 File-check fixtures (`testset/invalid/`, generated by `scripts/make-invalid-fixtures.ts` with
@@ -298,11 +333,18 @@ verified manually in the browser with the same files and listed in `DELIVERY.md`
 ## 8. Speed and cost measurement
 
 - Timings measured server-side per stage and client-side end-to-end (time to useful result).
-- Variable cost per operation = Deepgram audio minutes × STT price + Claude input/output tokens ×
-  model price, including retries. Prices live in `lib/pricing.ts` with the date checked and source
-  URL; verified against official pricing pages at implementation time.
-- Free credits are costed at list price.
-- Hosting (Vercel, Blob) reported separately, not included in per-operation cost.
+- Variable cost per operation, all at list price, including every retry:
+  - **Recognition:** Deepgram Nova-3 audio minutes × price.
+  - **Reasoning:** Claude input and output tokens × price (from API `usage`).
+  - **Speech output:** none in the product (reported as 0 with that reason).
+  - **Paid intermediaries:** Vercel Blob operations (upload, read, delete) and data transfer for the
+    file; Vercel Function compute for `/api/upload`, `/api/transcribe`, `/api/extract`
+    (measured duration × memory × price, plus invocations).
+  - Reported per operation and per audio minute.
+- Prices live in `lib/pricing.ts` with date checked and source URL, verified against official
+  pricing pages at implementation time; assumptions are named in `DELIVERY.md`.
+- Free credits and free tiers are costed at list price, not zero.
+- **Hosting (fixed)** reported separately: Vercel plan fee and Blob storage baseline.
 - Test-audio synthesis (Aura-2) reported separately as a one-time preparation cost.
 
 ## 9. Deliverables

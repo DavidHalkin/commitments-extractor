@@ -8,7 +8,8 @@ Source brief: `TS.md`
 A browser app where a user uploads a recorded project discussion (English, two speakers who
 introduce themselves, ≤ 3 minutes) and receives the **final state** of agreed tasks, owners,
 deadlines and unresolved questions. Every task, owner, deadline and unresolved question carries its
-own timestamped verbatim supporting quotation the user can play back. It is a commitments list, not a meeting summary.
+own timestamped verbatim supporting quotation the user can play back. It is a commitments list,
+not a meeting summary. Every upload and what happened to it is kept in a shared history.
 
 Hard rules from the brief:
 
@@ -32,51 +33,140 @@ languages other than English, overlapping speech, asking the user for the meetin
 | Reasoning | Claude Sonnet 5 (`claude-sonnet-5`) via tool use with a strict JSON schema, one pass |
 | Reliability | Deterministic server-side verifier: quotes, timestamps, owners, deadlines checked against the transcript |
 | Ambiguity | Item flags + explicit clarification list (`needs_clarification`) + `declined` result with reasons; no interactive dialogue |
-| Stack / hosting | Next.js (App Router, TypeScript) on Vercel; Vercel Blob for client uploads |
+| App | Next.js (App Router, TypeScript), `output: "standalone"`, packaged as a Docker image |
+| Hosting | Google Cloud Run; images in Artifact Registry; API keys in Secret Manager |
+| CI/CD | GitHub repository → GitHub Actions (checks, tests, build, deploy) with Workload Identity Federation |
+| Storage / history | One private Cloud Storage bucket: audio, run log, transcript, report, raw API responses; 30-day lifecycle; shared history visible to everyone |
 | Test audio | Scripts voiced with Deepgram Aura-2 (two voices), stitched with ffmpeg |
 | Test scoring | Deterministic eval script; expectations drafted from the scripts, reviewed and corrected by the user before the first run; no LLM judge |
 
 ## 3. Architecture and data flow
 
 ```
-Browser                              Vercel functions                   External
-1. Pick/drop file (mp3/wav/m4a/webm/ogg)
-   client file check (fast feedback): size, duration,
-   video track, real format — see §5a
-2. Upload directly to Vercel Blob ──► POST /api/upload (client token,
-                                      max size + allowed types enforced)
-3. POST /api/transcribe {blobUrl} ──► fetch bytes from Blob
-                                      server file check (authoritative, §5a)
-                                      send bytes to Deepgram ─────────► Deepgram
-                                      normalize → Transcript
-                                      precheck (may decline)
-                                      delete blob (also on rejection)
-4. POST /api/extract {transcript} ──► Claude tool call ──────────────► Anthropic
-                                      verify → Report
-5. Render report; playback from the local file (object URL), seeking to quote start/end
+Browser                                   Cloud Run (Next.js)                    External
+1. Pick/drop file (mp3/wav/m4a/webm/ogg/flac)
+   client file check (fast feedback, §5a)
+2. POST /api/runs {fileName, size} ─────► create runId, run.json (status: created)
+                                          signed PUT URL for runs/<id>/audio
+   ◄──────────────────────────────────── {runId, upload: {url, method, headers}}
+3. PUT file directly to Cloud Storage ───────────────────────────────────────► GCS
+   (bypasses Cloud Run 32 MB request limit; size limit enforced by
+    x-goog-content-length-range in the signed URL)
+4. POST /api/runs/:id/transcribe ───────► read bytes from GCS
+                                          server file check (authoritative, §5a)
+                                            └ rejected → status rejected, stop
+                                          send bytes to Deepgram ─────────────► Deepgram
+                                          save transcript.json, raw/deepgram.json
+                                          precheck (may decline)
+5. POST /api/runs/:id/extract ──────────► Claude tool call ────────────────────► Anthropic
+                                          save raw/claude.json
+                                          verify → report.json, status done
+6. Render report; playback from the local file (object URL), seeking to quote start/end
 ```
 
-Two endpoints instead of one so the UI shows per-stage progress and each stage is timed
-separately; each function stays well inside Vercel duration limits (`maxDuration` 60 s).
-API keys live only in server environment variables.
+- Separate stage endpoints give per-stage progress and timing in the UI. Each endpoint appends
+  events to the run log (§3b) and is idempotent by status: a finished stage is not re-run; a
+  failed stage can be retried.
+- Cloud Run request timeout 120 s; `/extract` is the longest stage.
+- API keys are server-only (Secret Manager mounted as environment variables).
+- History pages play audio through short-lived signed GET URLs; the bucket is never public.
+
+### 3a. Build and deploy
+
+```
+GitHub
+ ├─ pull request → Actions: npm ci → typecheck → lint → vitest
+ └─ push to main → Actions: same checks → docker build → push to Artifact Registry
+                             → gcloud run deploy (new revision)
+Auth GitHub → GCP: Workload Identity Federation (no service-account JSON keys in GitHub secrets)
+```
+
+- **Dockerfile:** multi-stage, Node 22, Next.js standalone output, non-root user.
+- **Cloud Run service:** min instances 0, max 2, 1 vCPU, 1 GiB, timeout 120 s, region set in
+  `infra/config.sh` (default `europe-west1`).
+- **Runtime service account** (least privilege): `roles/storage.objectAdmin` on the bucket only,
+  `roles/secretmanager.secretAccessor` on the two secrets, `roles/iam.serviceAccountTokenCreator` on
+  itself (needed to sign URLs without a key file).
+- **Deployer service account** (used by Actions via WIF): Cloud Run admin, Artifact Registry writer,
+  `iam.serviceAccountUser` on the runtime account.
+- **`infra/setup.sh`:** idempotent gcloud commands that create the Artifact Registry repo, bucket
+  (with CORS for PUT/GET from the service URL and `localhost`, and a 30-day delete lifecycle rule),
+  both service accounts and bindings, the WIF pool/provider restricted to this repository, and the
+  secrets. The README lists the GitHub repository variables it prints.
+
+### 3b. Storage and history
+
+Storage is behind an interface `lib/store/` with two drivers selected by `STORE_DRIVER`:
+
+- `gcs` — production (Cloud Storage).
+- `local` — `.data/runs/` on disk with the same layout; uploads go to a local
+  `PUT /api/runs/:id/upload` route. Used for local development and tests without GCP.
+
+Layout per run:
+
+```
+runs/<runId>/                 runId = 20260916T132501Z-ab12cd (UTC timestamp + random suffix,
+  audio                                lexicographic order = chronological order)
+  run.json                    summary + event log
+  transcript.json             normalized Transcript
+  report.json                 final Report
+  raw/deepgram.json           raw STT response
+  raw/claude.json             raw model responses (every attempt)
+```
+
+`run.json`:
+
+```ts
+Run {
+  id: string
+  createdAt: string
+  file: { name: string, sizeBytes: number, declaredType: string,
+          detectedFormat: string | null, durationSec: number | null, hasVideo: boolean | null }
+  status: "created" | "uploaded" | "transcribing" | "transcribed" | "extracting"
+        | "done" | "rejected" | "failed"
+  rejection: { code: string, message: string } | null      // §5a codes
+  reportStatus: Report["status"] | null
+  events: { at: string, stage: "upload" | "file-check" | "transcribe" | "precheck"
+                              | "extract" | "verify",
+            type: "started" | "finished" | "rejected" | "failed" | "retry",
+            detail: string, durationMs?: number }[]
+  metrics: Metrics | null
+}
+```
+
+Examples of events: `file-check rejected: contains_video (MP4 with video track)`,
+`extract retry: tool output failed schema validation`, `verify finished: 6 items kept, 1 dropped`.
+
+History API:
+
+- `GET /api/runs` — latest 50 runs (list `runs/` prefixes, newest first, read each `run.json`).
+- `GET /api/runs/:id` — run, report, transcript.
+- `GET /api/runs/:id/audio` — redirect to a signed GET URL (15 min).
+- `DELETE /api/runs/:id` — deletes all objects of the run.
+
+History is shared: anyone with the demo URL sees and can delete all runs. Every page shows:
+"Uploads are visible to everyone who opens this demo and are deleted after 30 days."
+Eval scripts do not write to the shared history.
 
 ### Modules (`lib/`, pure where possible, unit-testable)
 
 | Module | Responsibility |
 |---|---|
-| `lib/types.ts` | `Transcript`, `Extraction`, `Report`, `Metrics` types |
-| `lib/stt/deepgram.ts` | Call Deepgram, normalize response into `Transcript` |
+| `lib/types.ts` | `Transcript`, `Extraction`, `Report`, `Run`, `Metrics` types |
+| `lib/stt/deepgram.ts` | Call Deepgram with bytes, normalize response into `Transcript` |
 | `lib/gate/file-check.ts` | Input file validation: size, real format by content, video track, duration (§5a) |
 | `lib/gate/precheck.ts` | Deterministic pre-LLM decline rules |
 | `lib/extract/prompt.ts` | System prompt and transcript rendering |
 | `lib/extract/schema.ts` | Tool JSON schema + runtime validation (zod) |
 | `lib/extract/claude.ts` | Model call; one retry on invalid output |
-| `lib/verify/verify.ts` | Quote matching, timestamp attribution, field checks, final filtering, post-LLM decline rules |
+| `lib/verify/verify.ts` | Quote matching, timestamp attribution, field checks, clarifications, status rules |
 | `lib/verify/text.ts` | Normalization and fuzzy matching helpers |
 | `lib/metrics.ts` + `lib/pricing.ts` | Stage timings, usage, cost computation; dated price constants with source URLs |
-| `lib/pipeline.ts` | `transcribe(audio)` and `extract(transcript)` used by both API routes and scripts |
+| `lib/store/{store,gcs,local}.ts` | Storage interface and drivers: objects, upload/download targets, list, delete |
+| `lib/runs/runs.ts` | Create run, append events, status transitions, list/read/delete runs |
+| `lib/pipeline.ts` | `transcribe(bytes)` and `extract(transcript)` used by API routes and scripts |
 
-`scripts/synthesize.ts` and `scripts/eval.ts` import the same `lib/` modules as the app.
+`scripts/synthesize.ts` and `scripts/eval.ts` import `lib/pipeline.ts` directly.
 
 ## 4. Data model
 
@@ -121,7 +211,7 @@ accepted; only explicit agreement makes a task `active`; later statements overri
 settles it, and that utterance is given as `evidence` (for a corrected deadline, the correction);
 `disputed` carries the utterance that leaves it open; quotes must be copied verbatim.
 
-### Report (returned to UI)
+### Report
 
 ```ts
 Report {
@@ -131,13 +221,14 @@ Report {
   speakers: { speaker, name, intro: Evidence | null }[]
   items: VerifiedItem[]            // owner/deadline each with own Evidence; flags; event timeline
   dropped: { summary, reason }[]   // removed by verifier, shown in a debug section
-  transcript: Transcript
   metrics: Metrics
 }
 Evidence { type, quote, utteranceId, speaker, speakerName, start, end }
 Flags: "owner_missing" | "owner_disputed" | "owner_unverified" | "deadline_missing"
      | "deadline_disputed" | "deadline_unverified" | "date_context_missing"
 ```
+
+The transcript is stored separately (`transcript.json`) and returned alongside the report.
 
 ## 5. Verifier rules (`lib/verify`)
 
@@ -172,12 +263,13 @@ The file name, extension and browser-reported MIME type are **not trusted**: a u
 `meeting.mp4` to `meeting.mp3`. Validation runs twice with the same limits:
 
 - **Client** (before upload, instant feedback; can be bypassed, so not authoritative).
-- **Server** in `/api/transcribe` on the actual bytes, before any paid API call. A rejected file
-  is deleted from Blob and never reaches Deepgram.
+- **Server** in `/api/runs/:id/transcribe` on the stored bytes, before any paid API call. A rejected
+  file never reaches Deepgram; it stays in the run (status `rejected`, reason in the log) so the
+  history shows what was uploaded.
 
 | Check | Rule | Client method | Server method |
 |---|---|---|---|
-| Size | 1 KB ≤ size ≤ 35 MB (3 min stereo 44.1 kHz WAV ≈ 32 MB) | `File.size` | byte length; Blob token `maximumSizeInBytes` |
+| Size | 1 KB ≤ size ≤ 35 MB (3 min stereo 44.1 kHz WAV ≈ 32 MB) | `File.size` | object size; signed URL `x-goog-content-length-range` |
 | Real format | Detected from magic bytes, must be an audio container: MP3, WAV, M4A/MP4, WebM/Matroska, Ogg, FLAC. Extension mismatch without video (e.g. WAV named `.mp3`) is accepted and processed as the real format | first bytes of `File` | `file-type` |
 | Video track | Any video stream → reject: "This file contains video (detected: MP4 with video track). Upload an audio-only file." | load into hidden `<video>`; `videoWidth > 0` → video | `music-metadata` `format.hasVideo` / track list |
 | Duration | 3 s ≤ duration ≤ 180 s (server allows 185 s tolerance) | `<audio>` `loadedmetadata` | `music-metadata` `format.duration` |
@@ -188,7 +280,7 @@ and relies on the post-STT duration check from Deepgram metadata (below), which 
 Claude call. Each rejection returns a machine code (`file_too_large`, `file_too_small`,
 `not_audio`, `contains_video`, `too_long`, `too_short`, `unreadable`) and a human message.
 
-### Decline rules
+### Decline and status rules
 
 Pre-LLM (`precheck`, skips the Claude call):
 - duration > 185 s (5 s tolerance for encoding)
@@ -208,11 +300,14 @@ Within the brief's scope (two speakers who introduce themselves) the `declined` 
 safeguards; they are covered by unit tests rather than recordings. A declined report still
 includes transcript and metrics.
 
-## 6. UI (single page)
+## 6. UI
+
+### Main page `/`
 
 1. **Input:** drop zone + "Choose file", file name, duration, audio player, "Extract commitments".
-   No text input for the source.
-2. **Processing:** stage list with live timings: Uploading → Transcribing → Extracting → Verifying.
+   No text input for the source. Shared-history notice.
+2. **Processing:** stage list with live timings: Uploading → Checking file → Transcribing →
+   Extracting → Verifying.
 3. **Result**, titled "Final commitments":
    - Speakers with intro quote ▶.
    - **Active tasks:** summary; **Owner** with its own quote `mm:ss ▶` (or ⚠ flag); **Deadline**
@@ -229,11 +324,19 @@ includes transcript and metrics.
    - **Declined** state: yellow panel with reasons instead of lists.
    - **Metrics:** stage timings, time to result, audio minutes, tokens in/out, cost per operation and
      per audio minute.
-   - "Show transcript" (click an utterance to play it) and "Download JSON".
+   - "Show transcript" (click an utterance to play it), "Download JSON", link to the run in History.
+
+### History `/history` and `/history/[id]`
+
+- **List:** date, file name, duration, status badge (done / needs clarification / declined /
+  rejected / failed), time to result, cost.
+- **Run page:** original audio player (signed URL); **event log** step by step with timings and
+  details; the same report view as the main page (▶ buttons play the stored audio); transcript;
+  raw Deepgram/Claude responses (collapsed); "Delete run".
 
 Errors: file validation failures (§5a) shown with the specific reason before upload and again if
-the server check rejects; failing stage named with a
-"Retry" button; invalid model output retried once, then shown as an error.
+the server check rejects; failing stage named with a "Retry" button; invalid model output retried
+once, then shown as an error. All of these are also recorded in the run log.
 
 ## 7. Test set and evaluation
 
@@ -293,7 +396,7 @@ without `anchor` applies to every output item (e.g. `{ "final_status": "active" 
 
 ### `scripts/eval.ts`
 
-Runs each case 3 times through `lib/pipeline.ts` and reports:
+Runs each case 3 times through `lib/pipeline.ts` (local, not written to shared history) and reports:
 
 - **Inclusion:** expected items found; field accuracy (status, owner, deadline wording, flags);
   owner and deadline evidence present and matching the expected script line.
@@ -305,6 +408,10 @@ Runs each case 3 times through `lib/pipeline.ts` and reports:
 
 Output: `eval/results/<timestamp>.json` and `.md`. Failures are reported as they are.
 
+In addition, the three test recordings are uploaded once through the deployed demo; those runs
+remain in History and their end-to-end timings (including upload and storage) are reported next to
+the local eval numbers.
+
 ### Unit tests (vitest, no network)
 
 Transcript fixtures for: quote normalization and fuzzy matching, wrong utterance id, fabricated
@@ -312,6 +419,9 @@ quote, final-state support rule, owner evidence (name only mentioned elsewhere �
 self-commitment → kept), deadline evidence (wording not in evidence quote → rejected; corrected
 deadline uses the correction), date anchor rule, clarification and status rules, precheck (3
 speakers, > 185 s, too few words), unidentified speaker decline.
+
+Run log and store (with the `local` driver): run creation, event append, status transitions,
+list order newest first, delete removes all objects.
 
 File-check fixtures (`testset/invalid/`, generated by `scripts/make-invalid-fixtures.ts` with
 ffmpeg, expected codes written in `testset/invalid/expected.json`):
@@ -333,30 +443,39 @@ verified manually in the browser with the same files and listed in `DELIVERY.md`
 
 ## 8. Speed and cost measurement
 
-- Timings measured server-side per stage and client-side end-to-end (time to useful result).
+- Timings measured server-side per stage and client-side end-to-end (time to useful result),
+  stored in `run.json`.
 - Variable cost per operation, all at list price, including every retry:
   - **Recognition:** Deepgram Nova-3 audio minutes × price.
   - **Reasoning:** Claude input and output tokens × price (from API `usage`).
   - **Speech output:** none in the product (reported as 0 with that reason).
-  - **Paid intermediaries:** Vercel Blob operations (upload, read, delete) and data transfer for the
-    file; Vercel Function compute for `/api/upload`, `/api/transcribe`, `/api/extract`
-    (measured duration × memory × price, plus invocations).
+  - **Paid intermediaries / infrastructure per operation:**
+    - Cloud Storage: write operations (audio, run.json updates, transcript, report, raw files),
+      read operations (audio read for transcription, history views), storage of the run for
+      30 days, network egress for playback.
+    - Cloud Run: vCPU-seconds and GiB-seconds of the request durations, plus requests.
   - Reported per operation and per audio minute.
 - Prices live in `lib/pricing.ts` with date checked and source URL, verified against official
-  pricing pages at implementation time; assumptions are named in `DELIVERY.md`.
+  pricing pages at implementation time; assumptions (region, storage class, instance size) are
+  named in `DELIVERY.md`.
 - Free credits and free tiers are costed at list price, not zero.
-- **Hosting (fixed)** reported separately: Vercel plan fee and Blob storage baseline.
+- **Hosting (fixed)** reported separately: Artifact Registry image storage, Secret Manager secret
+  versions (secrets are read at instance start, not per operation), idle Cloud Run (0 with min
+  instances 0).
+- **CI** reported separately: GitHub Actions minutes per build/deploy.
 - Test-audio synthesis (Aura-2) reported separately as a one-time preparation cost.
 
 ## 9. Deliverables
 
-- Deployed Vercel demo URL.
-- Repository with `README.md` (setup: env vars `DEEPGRAM_API_KEY`, `ANTHROPIC_API_KEY`,
-  `BLOB_READ_WRITE_TOKEN`; `npm run dev`, `npm test`, `npm run synth`, `npm run eval`).
+- Deployed Cloud Run demo URL.
+- GitHub repository with `README.md`: local setup (`STORE_DRIVER=local`, `DEEPGRAM_API_KEY`,
+  `ANTHROPIC_API_KEY`; `npm run dev`, `npm test`, `npm run synth`, `npm run eval`) and GCP setup
+  (`infra/setup.sh`, GitHub repository variables, first deploy).
+- `.github/workflows/ci.yml` (PR checks) and `.github/workflows/deploy.yml` (main → Cloud Run).
 - `DELIVERY.md`: sample inputs, expected vs actual (eval table), what failed, time spent, exact
   tools and models (Claude Code with Claude Opus 5, Deepgram Nova-3, Deepgram Aura-2, Claude
   Sonnet 5), one example of checking AI output, reused components vs own work, measured speed and
-  cost with pricing assumptions, hosting costs, next improvements.
+  cost with pricing assumptions, hosting and CI costs, next improvements.
 - Script for a ≤ 3-minute walkthrough video (recorded by the user).
 
 ## 10. Budget and risks
@@ -368,5 +487,8 @@ Target ≤ 8 focused hours; unfinished parts are listed in `DELIVERY.md`.
 | Diarization splits a TTS voice or merges both | Distinct voices; 5 % word threshold; measured and reported by eval |
 | Model misjudges final state on correction chains | Event timeline in schema; eval exposes it; two-pass extraction listed as next step |
 | STT misrecognizes names/anchors | Fuzzy matching; STT vs extraction attribution in eval |
-| Vercel 4.5 MB body limit | Client upload to Blob; server reads bytes from Blob and forwards to Deepgram |
-| Renamed/fake files bypass client checks | Authoritative server check on bytes before any paid call |
+| Cloud Run 32 MB request limit | Direct browser upload to Cloud Storage via signed URL; server reads bytes from the bucket |
+| Signed URLs fail on Cloud Run without a key file | Runtime account signs via IAM (`serviceAccountTokenCreator` on itself); covered by a deploy smoke test |
+| Renamed/fake files bypass client checks | Authoritative server check on stored bytes before any paid call |
+| GCP/WIF setup consumes the time budget | Scripted `infra/setup.sh`; `local` store driver keeps development unblocked |
+| Shared history exposes uploads | Notice on every page, delete button, 30-day lifecycle; no accounts by brief |

@@ -288,7 +288,8 @@ ffmpeg concat, writes `offsets.json`.
 in the app's output corresponds to an expected item: an output item matches if one of its
 verified quotes contains the anchor (normalized, ≤ 2 character edits). The app never sees anchors.
 Each `must_not` entry describes a forbidden state: the check fails if a matching item is in that
-state (e.g. "landing page" item is active, or "book the room" item has an owner).
+state (e.g. "landing page" item is active, or "book the room" item has an owner). An entry
+without `anchor` applies to every output item (e.g. `{ "final_status": "active" }` in `03-clarify`).
 
 ### `scripts/eval.ts`
 

@@ -1,0 +1,110 @@
+[
+  {
+    "line": 1,
+    "speaker": "Anna",
+    "start": 0,
+    "end": 4.76
+  },
+  {
+    "line": 2,
+    "speaker": "Mark",
+    "start": 5.16,
+    "end": 9.32
+  },
+  {
+    "line": 3,
+    "speaker": "Anna",
+    "start": 9.72,
+    "end": 12.84
+  },
+  {
+    "line": 4,
+    "speaker": "Mark",
+    "start": 13.24,
+    "end": 16.84
+  },
+  {
+    "line": 5,
+    "speaker": "Anna",
+    "start": 17.24,
+    "end": 21.76
+  },
+  {
+    "line": 6,
+    "speaker": "Mark",
+    "start": 22.16,
+    "end": 25.04
+  },
+  {
+    "line": 7,
+    "speaker": "Anna",
+    "start": 25.44,
+    "end": 28.48
+  },
+  {
+    "line": 8,
+    "speaker": "Mark",
+    "start": 28.88,
+    "end": 34.48
+  },
+  {
+    "line": 9,
+    "speaker": "Anna",
+    "start": 34.88,
+    "end": 37.4
+  },
+  {
+    "line": 10,
+    "speaker": "Anna",
+    "start": 37.8,
+    "end": 41.88
+  },
+  {
+    "line": 11,
+    "speaker": "Mark",
+    "start": 42.28,
+    "end": 46.72
+  },
+  {
+    "line": 12,
+    "speaker": "Anna",
+    "start": 47.12,
+    "end": 49.32
+  },
+  {
+    "line": 13,
+    "speaker": "Mark",
+    "start": 49.72,
+    "end": 52.56
+  },
+  {
+    "line": 14,
+    "speaker": "Anna",
+    "start": 52.96,
+    "end": 56.32
+  },
+  {
+    "line": 15,
+    "speaker": "Mark",
+    "start": 56.72,
+    "end": 61.76
+  },
+  {
+    "line": 16,
+    "speaker": "Anna",
+    "start": 62.16,
+    "end": 66.04
+  },
+  {
+    "line": 17,
+    "speaker": "Mark",
+    "start": 66.44,
+    "end": 73.36
+  },
+  {
+    "line": 18,
+    "speaker": "Anna",
+    "start": 73.76,
+    "end": 75.12
+  }
+]

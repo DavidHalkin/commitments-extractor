@@ -1,0 +1,10 @@
+{
+  "video-renamed.mp3": "contains_video",
+  "video-renamed.m4a": "contains_video",
+  "webm-video-renamed.webm": "contains_video",
+  "text-renamed.mp3": "not_audio",
+  "wav-renamed.mp3": "ok",
+  "too-long.mp3": "too_long",
+  "too-short.mp3": "too_short",
+  "empty.mp3": "file_too_small"
+}

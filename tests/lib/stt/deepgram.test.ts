@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { normalizeDeepgram, transcribeBytes, type DeepgramResponse } from "@/lib/stt/deepgram";
 
 const raw: DeepgramResponse = {
@@ -38,6 +38,10 @@ describe("normalizeDeepgram", () => {
 });
 
 describe("transcribeBytes", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("posts bytes with the fixed query and parses the response", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(raw), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -48,12 +52,10 @@ describe("transcribeBytes", () => {
     );
     expect(init.headers).toMatchObject({ Authorization: "Token key", "Content-Type": "audio/mpeg" });
     expect(transcript.utterances).toHaveLength(2);
-    vi.unstubAllGlobals();
   });
 
   it("throws with status on API errors", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("bad key", { status: 401 })));
     await expect(transcribeBytes(new Uint8Array([1]), "audio/mpeg", "key")).rejects.toThrow("Deepgram 401");
-    vi.unstubAllGlobals();
   });
 });

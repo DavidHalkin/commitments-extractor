@@ -1,27 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type RunDetail } from "@/app/components/api";
 import { clientFileCheck, type ClientCheck } from "@/app/components/clientFileCheck";
 import { MetricsView } from "@/app/components/MetricsView";
+import { RecordingTimeline } from "@/app/components/RecordingTimeline";
+import { buildMarkers } from "@/app/components/reportModel";
 import { ReportView } from "@/app/components/ReportView";
+import { initialSteps, ORDER, StageSequence, type StepName, type StepState } from "@/app/components/StageSequence";
+import { TimelineLinkProvider } from "@/app/components/timelineLink";
 import { TranscriptView } from "@/app/components/TranscriptView";
 import { useSegmentPlayer } from "@/app/components/useSegmentPlayer";
-import { formatMs } from "@/lib/format";
+import { useWaveform } from "@/app/components/useWaveform";
 import type { Run, UploadTarget } from "@/lib/types";
 
-type StepName = "upload" | "transcribe" | "extract";
-type StepState = { status: "pending" | "running" | "done" | "failed"; ms?: number };
-const ORDER: StepName[] = ["upload", "transcribe", "extract"];
-const LABEL: Record<StepName, string> = {
-  upload: "Uploading",
-  transcribe: "Checking file and transcribing",
-  extract: "Extracting and verifying",
-};
-const ICON = { pending: "○", running: "…", done: "✓", failed: "✗" } as const;
 const UPLOAD_TARGET_TTL_MS = 14 * 60 * 1000;
-const initialSteps = (): Record<StepName, StepState> => ({ upload: { status: "pending" }, transcribe: { status: "pending" }, extract: { status: "pending" } });
 
 function lastFailure(run: Run): string {
   return [...run.events].reverse().find((e) => e.type === "failed")?.detail ?? `Run ${run.status}`;
@@ -30,7 +24,6 @@ function lastFailure(run: Run): string {
 export function Uploader() {
   const [file, setFile] = useState<File | null>(null);
   const [check, setCheck] = useState<ClientCheck | null>(null);
-  const [over, setOver] = useState(false);
   const [steps, setSteps] = useState(initialSteps);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +32,14 @@ export function Uploader() {
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [uploadTarget, setUploadTarget] = useState<{ target: UploadTarget; createdAt: number } | null>(null);
   const { audioRef, playSegment } = useSegmentPlayer();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const objectUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
   useEffect(() => () => { if (objectUrl) URL.revokeObjectURL(objectUrl); }, [objectUrl]);
+
+  // Draw the waveform only for a file that passed the client check.
+  const waveform = useWaveform(file && check?.ok ? file : null);
+  const markers = useMemo(() => buildMarkers(detail?.report), [detail?.report]);
 
   function choose(f: File | undefined) {
     if (!f) return;
@@ -120,48 +118,62 @@ export function Uploader() {
   }
 
   const names = new Map((detail?.report?.speakers ?? []).filter((s) => s.name).map((s) => [s.speaker, s.name as string]));
+  const openPicker = () => inputRef.current?.click();
+  const usable = file != null && check?.ok !== false;
 
   return (
-    <div>
-      <h1>Recorded conversation → final commitments</h1>
-      <p className="muted">Upload an English recording (up to 3 minutes, two speakers who introduce themselves). You get the final tasks, owners, deadlines and open questions, each with a quote you can play.</p>
+    <TimelineLinkProvider>
+      <header className="page-intro">
+        <h1>Final commitments from a recorded discussion</h1>
+        <p className="lede">Upload an English recording up to 3 minutes with two speakers who introduce themselves. Every item links to the moment it was said.</p>
+      </header>
 
-      <div
-        className={`drop${over ? " over" : ""}`}
-        onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-        onDragLeave={() => setOver(false)}
-        onDrop={(e) => { e.preventDefault(); setOver(false); choose(e.dataTransfer.files[0]); }}
-      >
-        <p>Drop an audio file here</p>
-        <input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac" hidden onChange={(e) => choose(e.target.files?.[0])} />
-        <button type="button" onClick={() => document.getElementById("audio-file")?.click()}>Choose file</button>
-      </div>
+      <input ref={inputRef} id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac" hidden onChange={(e) => choose(e.target.files?.[0])} />
+      <RecordingTimeline
+        audioRef={audioRef}
+        audioSrc={objectUrl}
+        durationSec={check?.ok ? check.durationSec : null}
+        waveform={waveform}
+        markers={markers}
+        onPlay={playSegment}
+        onDropFile={choose}
+        prompt={usable ? undefined : (
+          <>
+            <p className="timeline-prompt-text">Drop a recording here, or choose a file</p>
+            <button type="button" className="btn btn-primary" onClick={openPicker}>Choose file</button>
+          </>
+        )}
+      />
 
       {file ? (
-        <div className="card">
-          <div className="row"><strong>{file.name}</strong><span className="muted">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-            {check?.ok ? <span className="muted">{check.format.toUpperCase()}, {check.durationSec?.toFixed(1) ?? "?"} s</span> : null}
+        <div className="file-panel">
+          <div className="file-row">
+            <p className="file-facts">
+              <span className="file-name">{file.name}</span>
+              <span className="muted">
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+                {check?.ok ? `, ${check.format.toUpperCase()}, ${check.durationSec?.toFixed(1) ?? "?"} s` : null}
+              </span>
+            </p>
+            {usable ? <button type="button" className="btn btn-quiet" onClick={openPicker}>Choose a different file</button> : null}
           </div>
-          {objectUrl ? <audio ref={audioRef} src={objectUrl} controls preload="metadata" /> : null}
-          {check && !check.ok ? <div className="banner bad">{check.message}</div> : null}
-          <div className="row">
-            <button type="button" className="primary" disabled={!check?.ok || busy} onClick={() => void process("upload")}>Extract commitments</button>
-            {failedStep && !busy ? <button type="button" onClick={() => void process(failedStep === "upload" || !runId ? "upload" : failedStep)}>Retry</button> : null}
+          {check === null ? <p className="muted" role="status">Checking the file…</p> : null}
+          {check && !check.ok ? <div className="banner tone-setaside" role="alert"><p className="banner-text">{check.message}</p></div> : null}
+          <div className="actions">
+            <button type="button" className="btn btn-primary" disabled={!check?.ok || busy} onClick={() => void process("upload")}>Extract commitments</button>
+            {failedStep && !busy ? <button type="button" className="btn" onClick={() => void process(failedStep === "upload" || !runId ? "upload" : failedStep)}>Retry</button> : null}
           </div>
         </div>
       ) : null}
 
-      {runId ? (
-        <ul className="steps">
-          {ORDER.map((s) => (
-            <li key={s}>{ICON[steps[s].status]} {LABEL[s]} {steps[s].ms != null ? <span className="muted">{formatMs(steps[s].ms)}</span> : null}</li>
-          ))}
-        </ul>
-      ) : null}
-      {error ? <div className="banner bad">{error}</div> : null}
+      {runId ? <StageSequence steps={steps} /> : null}
+      {error ? <div className="banner tone-setaside" role="alert"><p className="banner-text">{error}</p></div> : null}
 
       {detail?.run.status === "rejected" && detail.run.rejection ? (
-        <div className="banner bad"><strong>File rejected by the server check:</strong> {detail.run.rejection.message}</div>
+        <div className="banner tone-setaside" role="alert">
+          <p className="banner-title">File rejected by the server check.</p>
+          <p className="banner-text">{detail.run.rejection.message}</p>
+        </div>
       ) : null}
 
       {detail?.report ? <ReportView report={detail.report} onPlay={playSegment} /> : null}
@@ -169,9 +181,9 @@ export function Uploader() {
       {detail ? (
         <>
           <MetricsView metrics={{ stageMs: detail.run.stageMs, timeToResultMs: detail.run.timeToResultMs, usage: detail.run.usage, cost: detail.run.cost }} />
-          <div className="row">
+          <div className="actions actions-end">
             {detail.report ? (
-              <button type="button" onClick={() => {
+              <button type="button" className="btn" onClick={() => {
                 const blob = new Blob([JSON.stringify({ report: detail.report, transcript: detail.transcript }, null, 2)], { type: "application/json" });
                 const a = document.createElement("a");
                 a.href = URL.createObjectURL(blob);
@@ -184,6 +196,6 @@ export function Uploader() {
           </div>
         </>
       ) : null}
-    </div>
+    </TimelineLinkProvider>
   );
 }

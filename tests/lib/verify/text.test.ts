@@ -12,7 +12,7 @@ const words = (s: string) => s.split(" ").map((punctuated) => ({ punctuated }));
 describe("normalize", () => {
   it("lowercases, drops apostrophes and punctuation, collapses spaces", () => {
     expect(normalize("  I'll write the API docs, by Wednesday! ")).toBe("ill write the api docs by wednesday");
-    expect(normalize("It's done")).toBe("its done");
+    expect(normalize("It’s done")).toBe("its done");
   });
 });
 

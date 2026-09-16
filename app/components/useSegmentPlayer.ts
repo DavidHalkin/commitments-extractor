@@ -20,11 +20,18 @@ export function useSegmentPlayer() {
     const onSeekByUser = () => {
       if (audio.paused) stopAt.current = null;
     };
+    const onSourceChange = () => {
+      stopAt.current = null;
+    };
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("pause", onSeekByUser);
+    audio.addEventListener("emptied", onSourceChange);
+    audio.addEventListener("loadstart", onSourceChange);
     return () => {
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("pause", onSeekByUser);
+      audio.removeEventListener("emptied", onSourceChange);
+      audio.removeEventListener("loadstart", onSourceChange);
     };
   });
 

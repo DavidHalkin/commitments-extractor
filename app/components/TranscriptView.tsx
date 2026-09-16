@@ -8,7 +8,7 @@ export function TranscriptView({ transcript, onPlay, names }: { transcript: Tran
       <summary>Transcript ({transcript.utterances.length} utterances)</summary>
       {transcript.utterances.map((u) => (
         <div key={u.id} className="evidence">
-          <button type="button" className="play" onClick={() => onPlay(u.start, u.end)}>▶ {formatTime(u.start)}</button>
+          <button type="button" className="play" onClick={() => onPlay(u.start, u.end)} aria-label={`Play from ${formatTime(u.start)}`}>▶ {formatTime(u.start)}</button>
           <span className="speaker">{names?.get(u.speaker) ?? `Speaker ${u.speaker}`}:</span> {u.text}
         </div>
       ))}

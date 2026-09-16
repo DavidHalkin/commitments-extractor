@@ -20,6 +20,7 @@ const LABEL: Record<StepName, string> = {
   extract: "Extracting and verifying",
 };
 const ICON = { pending: "○", running: "…", done: "✓", failed: "✗" } as const;
+const UPLOAD_TARGET_TTL_MS = 14 * 60 * 1000;
 const initialSteps = (): Record<StepName, StepState> => ({ upload: { status: "pending" }, transcribe: { status: "pending" }, extract: { status: "pending" } });
 
 function lastFailure(run: Run): string {
@@ -36,12 +37,13 @@ export function Uploader() {
   const [failedStep, setFailedStep] = useState<StepName | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [detail, setDetail] = useState<RunDetail | null>(null);
+  const [uploadTarget, setUploadTarget] = useState<{ target: UploadTarget; createdAt: number } | null>(null);
   const { audioRef, playSegment } = useSegmentPlayer();
 
   const objectUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
   useEffect(() => () => { if (objectUrl) URL.revokeObjectURL(objectUrl); }, [objectUrl]);
 
-  async function choose(f: File | undefined) {
+  function choose(f: File | undefined) {
     if (!f) return;
     setFile(f);
     setCheck(null);
@@ -49,11 +51,19 @@ export function Uploader() {
     setError(null);
     setFailedStep(null);
     setRunId(null);
+    setUploadTarget(null);
     setSteps(initialSteps());
   }
 
   useEffect(() => {
-    if (file && objectUrl) void clientFileCheck(file, objectUrl).then(setCheck);
+    if (!file || !objectUrl) return;
+    let cancelled = false;
+    void clientFileCheck(file, objectUrl).then((r) => {
+      if (!cancelled) setCheck(r);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [file, objectUrl]);
 
   const setStep = (s: StepName, state: StepState) => setSteps((prev) => ({ ...prev, [s]: state }));
@@ -69,13 +79,19 @@ export function Uploader() {
       const t0 = performance.now();
       try {
         if (s === "upload") {
-          const created = await api<{ runId: string; upload: UploadTarget }>("/api/runs", {
-            method: "POST",
-            body: JSON.stringify({ fileName: file.name, sizeBytes: file.size, declaredType: file.type }),
-          });
-          id = created.runId;
-          setRunId(id);
-          const put = await fetch(created.upload.url, { method: created.upload.method, headers: created.upload.headers, body: file });
+          const target = id && uploadTarget && Date.now() - uploadTarget.createdAt < UPLOAD_TARGET_TTL_MS
+            ? uploadTarget.target
+            : await (async () => {
+                const created = await api<{ runId: string; upload: UploadTarget }>("/api/runs", {
+                  method: "POST",
+                  body: JSON.stringify({ fileName: file.name, sizeBytes: file.size, declaredType: file.type }),
+                });
+                id = created.runId;
+                setRunId(id);
+                setUploadTarget({ target: created.upload, createdAt: Date.now() });
+                return created.upload;
+              })();
+          const put = await fetch(target.url, { method: target.method, headers: target.headers, body: file });
           if (!put.ok) throw new Error(`Upload failed (${put.status})`);
         } else if (s === "transcribe") {
           const { run } = await api<{ run: Run }>(`/api/runs/${id}/transcribe`, { method: "POST" });
@@ -114,10 +130,10 @@ export function Uploader() {
         className={`drop${over ? " over" : ""}`}
         onDragOver={(e) => { e.preventDefault(); setOver(true); }}
         onDragLeave={() => setOver(false)}
-        onDrop={(e) => { e.preventDefault(); setOver(false); void choose(e.dataTransfer.files[0]); }}
+        onDrop={(e) => { e.preventDefault(); setOver(false); choose(e.dataTransfer.files[0]); }}
       >
         <p>Drop an audio file here</p>
-        <input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac" hidden onChange={(e) => void choose(e.target.files?.[0])} />
+        <input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac" hidden onChange={(e) => choose(e.target.files?.[0])} />
         <button type="button" onClick={() => document.getElementById("audio-file")?.click()}>Choose file</button>
       </div>
 

@@ -17,6 +17,13 @@ const EVENT_LABEL: Record<string, string> = {
   question_raised: "question raised", left_open: "left open",
 };
 
+const OWNER_FLAGS: Flag[] = ["owner_missing", "owner_disputed", "owner_unverified"];
+const DEADLINE_FLAGS: Flag[] = ["deadline_missing", "deadline_disputed", "deadline_unverified", "date_context_missing"];
+
+function FlagBadges({ flags }: { flags: Flag[] }) {
+  return <>{flags.map((f) => <span key={f} className="flag">⚠ {FLAG_TEXT[f]}</span>)}</>;
+}
+
 function TaskCard({ item, onPlay }: { item: VerifiedItem; onPlay: OnPlay }) {
   const showFields = item.finalStatus === "active" || item.owner.status === "disputed" || item.deadline.status === "disputed";
   return (
@@ -27,15 +34,16 @@ function TaskCard({ item, onPlay }: { item: VerifiedItem; onPlay: OnPlay }) {
           <div>
             Owner: {item.owner.name ?? <span className="muted">—</span>}
             {item.owner.evidence ? <EvidenceLine ev={item.owner.evidence} onPlay={onPlay} label="owner" /> : null}
+            <FlagBadges flags={item.flags.filter((f) => OWNER_FLAGS.includes(f))} />
           </div>
           <div>
             Deadline: {item.deadline.wording ? `“${item.deadline.wording}”` : <span className="muted">—</span>}
             {item.deadline.resolvedDate ? ` (${item.deadline.resolvedDate})` : null}
             {item.deadline.evidence ? <EvidenceLine ev={item.deadline.evidence} onPlay={onPlay} label="deadline" /> : null}
+            <FlagBadges flags={item.flags.filter((f) => DEADLINE_FLAGS.includes(f))} />
           </div>
         </>
       ) : null}
-      <div>{item.flags.map((f) => <span key={f} className="flag">⚠ {FLAG_TEXT[f]}</span>)}</div>
       <details>
         <summary>Evidence timeline ({item.events.length})</summary>
         {item.events.map((ev, i) => <EvidenceLine key={i} ev={ev} onPlay={onPlay} label={EVENT_LABEL[ev.type] ?? ev.type} />)}
@@ -108,7 +116,7 @@ export function ReportView({ report, onPlay }: { report: Report; onPlay: OnPlay 
       ) : null}
       {notAccepted.length > 0 ? (
         <details>
-          <summary>Proposals not accepted ({notAccepted.length}) — not commitments</summary>
+          <summary>Proposals not accepted ({notAccepted.length}) — not a commitment</summary>
           {notAccepted.map((it, i) => <TaskCard key={i} item={it} onPlay={onPlay} />)}
         </details>
       ) : null}

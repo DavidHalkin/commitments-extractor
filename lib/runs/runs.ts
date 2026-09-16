@@ -43,6 +43,7 @@ export class Runs {
       file: { ...file, detectedFormat: null, mime: null, durationSec: null, hasVideo: null },
       status: "created",
       failedStage: null,
+      stageStartedAt: null,
       rejection: null,
       reportStatus: null,
       events: [],

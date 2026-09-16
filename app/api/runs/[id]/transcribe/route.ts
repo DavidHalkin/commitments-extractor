@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Runs } from "@/lib/runs/runs";
-import { stageTranscribe } from "@/lib/runs/stages";
+import { ConflictError, stageTranscribe } from "@/lib/runs/stages";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,5 +11,10 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const runs = new Runs();
   const run = await runs.get(id);
   if (!run) return NextResponse.json({ error: "Run not found" }, { status: 404 });
-  return NextResponse.json({ run: await stageTranscribe(runs, run) });
+  try {
+    return NextResponse.json({ run: await stageTranscribe(runs, run) });
+  } catch (e) {
+    if (e instanceof ConflictError) return NextResponse.json({ error: e.message }, { status: 409 });
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+  }
 }

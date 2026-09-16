@@ -35,7 +35,13 @@ const extraction: Extraction = {
 
 vi.mock("@/lib/extract/claude", () => ({
   EXTRACT_MODEL: "claude-sonnet-5",
-  ExtractionError: class extends Error {},
+  ExtractionError: class ExtractionError extends Error {
+    attempts: unknown[];
+    constructor(message: string, attempts: unknown[]) {
+      super(message);
+      this.attempts = attempts;
+    }
+  },
   extractCommitments: vi.fn(async () => ({
     extraction,
     attempts: [{ ok: true, stopReason: "end_turn", inputTokens: 1200, outputTokens: 400, raw: {} }],
@@ -44,7 +50,12 @@ vi.mock("@/lib/extract/claude", () => ({
 
 const { LocalStore } = await import("@/lib/store/local");
 const { Runs } = await import("@/lib/runs/runs");
-const { stageExtract, stageTranscribe } = await import("@/lib/runs/stages");
+const { ConflictError, stageExtract, stageTranscribe } = await import("@/lib/runs/stages");
+const { transcribeBytes } = await import("@/lib/stt/deepgram");
+const { extractCommitments, ExtractionError } = await import("@/lib/extract/claude");
+
+const defaultTranscribeImpl = vi.mocked(transcribeBytes).getMockImplementation()!;
+const defaultExtractImpl = vi.mocked(extractCommitments).getMockImplementation()!;
 
 let root: string;
 let runs: InstanceType<typeof Runs>;
@@ -54,6 +65,12 @@ beforeEach(() => {
   root = mkdtempSync(path.join(tmpdir(), "stages-"));
   store = new LocalStore(root);
   runs = new Runs(store);
+  vi.mocked(transcribeBytes).mockClear();
+  vi.mocked(transcribeBytes).mockReset();
+  vi.mocked(transcribeBytes).mockImplementation(defaultTranscribeImpl);
+  vi.mocked(extractCommitments).mockClear();
+  vi.mocked(extractCommitments).mockReset();
+  vi.mocked(extractCommitments).mockImplementation(defaultExtractImpl);
 });
 afterEach(() => rmSync(root, { recursive: true, force: true }));
 
@@ -71,7 +88,6 @@ describe("stages", () => {
     expect(after.status).toBe("rejected");
     expect(after.rejection?.code).toBe("contains_video");
     expect(after.cost?.recognition).toBe(0);
-    const { transcribeBytes } = await import("@/lib/stt/deepgram");
     expect(transcribeBytes).not.toHaveBeenCalled();
     expect((await runs.list())[0].status).toBe("rejected");
   });
@@ -100,5 +116,61 @@ describe("stages", () => {
     const { run } = await runs.create({ name: "x.mp3", sizeBytes: 5000, declaredType: "" }, "claude-sonnet-5");
     const after = await stageTranscribe(runs, run);
     expect(after).toMatchObject({ status: "failed", failedStage: "upload" });
+  });
+
+  it("fails on a Deepgram error, accounts the cost, and succeeds on retry", async () => {
+    const run = await uploaded("wav-renamed.mp3");
+    vi.mocked(transcribeBytes).mockRejectedValueOnce(new Error("Deepgram 503"));
+
+    const failed = await stageTranscribe(runs, run);
+    expect(failed.status).toBe("failed");
+    expect(failed.failedStage).toBe("transcribe");
+    expect(failed.events.some((e) => e.detail.includes("503"))).toBe(true);
+    expect(failed.cost).not.toBeNull();
+
+    const reloaded = await runs.get(failed.id);
+    const after = await stageTranscribe(runs, reloaded!);
+    expect(after.status).toBe("transcribed");
+  });
+
+  it("counts every Claude attempt, even failed ones, when extraction fails", async () => {
+    const run = await uploaded("wav-renamed.mp3");
+    const transcribed = await stageTranscribe(runs, run);
+
+    const attempts = [
+      { ok: false, stopReason: "max_tokens", inputTokens: 1000, outputTokens: 16000, error: "truncated", raw: { truncated: true } },
+      { ok: false, stopReason: null, inputTokens: 0, outputTokens: 0, error: "network error", raw: null },
+    ];
+    vi.mocked(extractCommitments).mockRejectedValueOnce(new ExtractionError("Extraction failed after 2 attempts", attempts));
+
+    const { run: failed, report } = await stageExtract(runs, transcribed);
+    expect(report).toBeNull();
+    expect(failed.status).toBe("failed");
+    expect(failed.failedStage).toBe("extract");
+    expect(failed.usage.claudeInputTokens).toBe(1000);
+    expect(failed.usage.claudeOutputTokens).toBe(16000);
+    expect(failed.usage.claudeAttempts).toBe(2);
+    expect(failed.cost).not.toBeNull();
+    expect(await runs.getJson(failed.id, "raw/claude.json")).not.toBeNull();
+  });
+
+  it("guards a concurrent extract in flight and recovers once it is stale", async () => {
+    const run = await uploaded("wav-renamed.mp3");
+    const transcribed = await stageTranscribe(runs, run);
+
+    transcribed.status = "extracting";
+    transcribed.stageStartedAt = new Date().toISOString();
+    await runs.save(transcribed);
+
+    const inFlight = await runs.get(transcribed.id);
+    await expect(stageExtract(runs, inFlight!)).rejects.toThrow(ConflictError);
+
+    const stale = await runs.get(transcribed.id);
+    stale!.stageStartedAt = new Date(Date.now() - 200_000).toISOString();
+    await runs.save(stale!);
+    const staleLoaded = await runs.get(transcribed.id);
+
+    const { run: done } = await stageExtract(runs, staleLoaded!);
+    expect(done.status).toBe("done");
   });
 });

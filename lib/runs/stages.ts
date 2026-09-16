@@ -5,9 +5,19 @@ import type { Metrics, Report, Run, Transcript } from "@/lib/types";
 
 export class ConflictError extends Error {}
 
+/** A "transcribing"/"extracting" run older than this is assumed to have died (crash, timeout) and is retried. */
+const STALE_STAGE_MS = 150_000;
+
+function isStaleInFlight(stageStartedAt: string | null): boolean {
+  if (!stageStartedAt) return true;
+  return Date.now() - Date.parse(stageStartedAt) >= STALE_STAGE_MS;
+}
+
 function accountRequest(run: Run, startedAt: number) {
   run.usage.cloudRunRequests += 1;
   run.usage.cloudRunSeconds += (Date.now() - startedAt) / 1000;
+  // So a failed run still shows the cost already incurred, not just successful ones.
+  run.cost = computeCost(run.usage);
 }
 
 /** Final accounting. `pendingWrites` are the uncounted report.json/run.json writes that follow. */
@@ -22,15 +32,32 @@ function finalizeRun(run: Run, startedAt: number, pendingWrites: number): Metric
 const logTo = (run: Run): OnEvent => (stage, type, detail, ms) => addEvent(run, stage, type, detail, ms);
 
 export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
-  const allowed = run.status === "created" || (run.status === "failed" && (run.failedStage === "upload" || run.failedStage === "transcribe"));
+  let allowed = run.status === "created" || (run.status === "failed" && (run.failedStage === "upload" || run.failedStage === "transcribe"));
+  if (run.status === "transcribing") {
+    if (!isStaleInFlight(run.stageStartedAt)) throw new ConflictError("Transcription already in progress");
+    addEvent(run, "transcribe", "failed", "previous attempt timed out");
+    allowed = true;
+  }
   if (!allowed) return run;
   const startedAt = Date.now();
 
-  const bytes = await runs.getAudio(run);
+  let bytes: Uint8Array | null;
+  try {
+    bytes = await runs.getAudio(run);
+  } catch (e) {
+    addEvent(run, "upload", "failed", e instanceof Error ? e.message : String(e));
+    run.status = "failed";
+    run.failedStage = "upload";
+    run.stageStartedAt = null;
+    accountRequest(run, startedAt);
+    await runs.save(run);
+    return run;
+  }
   if (!bytes) {
     addEvent(run, "upload", "failed", "Audio file not found in storage; the upload did not complete");
     run.status = "failed";
     run.failedStage = "upload";
+    run.stageStartedAt = null;
     accountRequest(run, startedAt);
     await runs.save(run);
     return run;
@@ -44,6 +71,9 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
 
   run.status = "transcribing";
   run.failedStage = null;
+  run.stageStartedAt = new Date().toISOString();
+  await runs.save(run); // counted write: marks this run in-flight before the paid Deepgram call
+
   try {
     const outcome = await runTranscribe(bytes, logTo(run));
     Object.assign(run.stageMs, outcome.ms);
@@ -55,18 +85,20 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     if (outcome.kind === "rejected") {
       run.status = "rejected";
       run.rejection = { code: outcome.check.code, message: outcome.check.message };
+      run.stageStartedAt = null;
       finalizeRun(run, startedAt, 1);
       await runs.save(run, { counted: false });
       return run;
     }
 
-    run.usage.audioSeconds = outcome.transcript.durationSec;
+    run.usage.audioSeconds += outcome.transcript.durationSec;
     await runs.putJson(run, "transcript.json", outcome.transcript);
     await runs.putJson(run, "raw/deepgram.json", outcome.raw);
 
     if (outcome.kind === "declined") {
       run.status = "done";
       run.reportStatus = "declined";
+      run.stageStartedAt = null;
       const metrics = finalizeRun(run, startedAt, 2);
       await runs.putJson(run, "report.json", { ...declinedReport(outcome.reasons), metrics }, { counted: false });
       await runs.save(run, { counted: false });
@@ -74,11 +106,16 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     }
 
     run.status = "transcribed";
+    run.stageStartedAt = null;
   } catch (e) {
     const stage = e instanceof StageError ? e.stage : "transcribe";
     addEvent(run, stage, "failed", e instanceof Error ? e.message : String(e));
     run.status = "failed";
     run.failedStage = stage;
+    run.stageStartedAt = null;
+    accountRequest(run, startedAt);
+    await runs.save(run);
+    return run;
   }
   accountRequest(run, startedAt);
   await runs.save(run);
@@ -87,8 +124,13 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
 
 export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; report: Report | null }> {
   if (run.status === "done") return { run, report: await runs.getJson<Report>(run.id, "report.json") };
-  const allowed = run.status === "transcribed" || (run.status === "failed" && (run.failedStage === "extract" || run.failedStage === "verify"));
-  if (!allowed) throw new ConflictError(`Run is "${run.status}"; transcribe it first`);
+  let allowed = run.status === "transcribed" || (run.status === "failed" && (run.failedStage === "extract" || run.failedStage === "verify"));
+  if (run.status === "extracting") {
+    if (!isStaleInFlight(run.stageStartedAt)) throw new ConflictError("Extraction already in progress");
+    addEvent(run, "extract", "failed", "previous attempt timed out");
+    allowed = true;
+  }
+  if (!allowed) throw new ConflictError(`Run is "${run.status}"; extraction needs a transcribed run`);
   const startedAt = Date.now();
 
   const transcript = await runs.getJson<Transcript>(run.id, "transcript.json");
@@ -97,29 +139,45 @@ export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; re
 
   run.status = "extracting";
   run.failedStage = null;
+  run.stageStartedAt = new Date().toISOString();
+  await runs.save(run); // counted write: marks this run in-flight before the paid Claude call
+
+  let out: Awaited<ReturnType<typeof runExtract>>;
   try {
-    const out = await runExtract(transcript, logTo(run));
+    out = await runExtract(transcript, logTo(run));
     addAttempts(run.usage, out.attempts);
     Object.assign(run.stageMs, out.ms);
     await runs.putJson(run, "raw/claude.json", out.attempts.map((a) => a.raw));
-    run.status = "done";
-    run.reportStatus = out.report.status;
-    const metrics = finalizeRun(run, startedAt, 2);
-    const report: Report = { ...out.report, metrics };
-    await runs.putJson(run, "report.json", report, { counted: false });
-    await runs.save(run, { counted: false });
-    return { run, report };
   } catch (e) {
     const stage = e instanceof StageError ? e.stage : "extract";
     if (e instanceof StageError && e.attempts.length) {
       addAttempts(run.usage, e.attempts);
-      await runs.putJson(run, "raw/claude.json", e.attempts.map((a) => a.raw ?? { error: a.error }));
+      try {
+        await runs.putJson(run, "raw/claude.json", e.attempts.map((a) => a.raw ?? { error: a.error }));
+      } catch (writeErr) {
+        addEvent(
+          run,
+          stage,
+          "failed",
+          `Could not store the raw Claude response: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`,
+        );
+      }
     }
     addEvent(run, stage, "failed", e instanceof Error ? e.message : String(e));
     run.status = "failed";
     run.failedStage = stage;
+    run.stageStartedAt = null;
     accountRequest(run, startedAt);
     await runs.save(run);
     return { run, report: null };
   }
+
+  run.status = "done";
+  run.reportStatus = out.report.status;
+  run.stageStartedAt = null;
+  const metrics = finalizeRun(run, startedAt, 2);
+  const report: Report = { ...out.report, metrics };
+  await runs.putJson(run, "report.json", report, { counted: false });
+  await runs.save(run, { counted: false });
+  return { run, report };
 }

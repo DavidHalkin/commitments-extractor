@@ -156,6 +156,8 @@ export type Run = {
   };
   status: RunStatus;
   failedStage: Stage | null;
+  /** Set when entering "transcribing"/"extracting"; used to detect and recover from stuck in-flight stages. */
+  stageStartedAt: string | null;
   rejection: { code: string; message: string } | null;
   reportStatus: ReportStatus | null;
   events: RunEvent[];

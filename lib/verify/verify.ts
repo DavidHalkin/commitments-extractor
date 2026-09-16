@@ -11,7 +11,7 @@ import type {
   Utterance,
   VerifiedItem,
 } from "@/lib/types";
-import { containsPhrase, findQuoteSpan, normalize } from "@/lib/verify/text";
+import { containsPhrase, findQuoteSpan, HEDGES, normalize, tokens } from "@/lib/verify/text";
 
 const MONTH = "(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)";
 const ABSOLUTE_DATE = new RegExp(
@@ -29,6 +29,30 @@ const SUPPORT: Record<ExtractedItem["final_status"], EventType[]> = {
   not_accepted: ["proposed"],
   open: ["question_raised", "left_open"],
 };
+
+/** Timeline events whose latest occurrence determines a task's actual final state. */
+const STATE_EVENT_STATUS: Partial<Record<EventType, ExtractedItem["final_status"]>> = {
+  accepted: "active",
+  assigned: "active",
+  reopened: "active",
+  cancelled: "cancelled",
+  proposed: "not_accepted",
+};
+
+/** Event types whose evidence quote must not merely hedge or propose to count as real commitment support. */
+const HEDGE_SENSITIVE_EVENTS = new Set<EventType>(["accepted", "assigned"]);
+
+function isHedgedQuote(quote: string): boolean {
+  return tokens(quote).some((tok) => HEDGES.has(tok));
+}
+
+/** An owner/deadline evidence utterance must sit within one utterance of one of the item's own timeline events. */
+function isNearEvents(ev: Evidence, eventIndices: Set<number>, utteranceIndex: Map<string, number>): boolean {
+  const idx = utteranceIndex.get(ev.utteranceId);
+  if (idx == null) return false;
+  for (const i of eventIndices) if (Math.abs(i - idx) <= 1) return true;
+  return false;
+}
 
 type Locate = (ref: EvidenceRef | null, type: EvidenceType) => Evidence | null;
 
@@ -68,11 +92,36 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
   const consistent = (x.kind === "open_question") === (x.final_status === "open");
   if (!consistent) return { dropped: `inconsistent kind "${x.kind}" with status "${x.final_status}"` };
 
-  const events = x.events.map((e) => locate(e, e.type)).filter((e): e is Evidence => e != null);
+  const events = x.events
+    .map((e) => locate(e, e.type))
+    .filter((e): e is Evidence => e != null)
+    .sort((a, b) => a.start - b.start);
+
   const needed = SUPPORT[x.final_status];
-  if (!events.some((e) => needed.includes(e.type as EventType))) {
+  const supportingEvents = events.filter(
+    (e) => needed.includes(e.type as EventType) && !(HEDGE_SENSITIVE_EVENTS.has(e.type as EventType) && isHedgedQuote(e.quote)),
+  );
+  if (supportingEvents.length === 0) {
     return { dropped: `no verified quote for a ${needed.join(" or ")} event supporting status "${x.final_status}"` };
   }
+
+  if (x.kind === "task") {
+    const stateEvents = events.filter((e) => (e.type as EventType) in STATE_EVENT_STATUS);
+    const latestState = stateEvents[stateEvents.length - 1];
+    if (latestState) {
+      const mapped = STATE_EVENT_STATUS[latestState.type as EventType];
+      if (mapped && mapped !== x.final_status) {
+        return { dropped: `latest verified event "${latestState.type}" contradicts status "${x.final_status}"` };
+      }
+    }
+  }
+
+  const utteranceIndex = new Map(t.utterances.map((u, i) => [u.id, i]));
+  const eventIndices = new Set(
+    events.map((e) => utteranceIndex.get(e.utteranceId)).filter((i): i is number => i != null),
+  );
+  const deadlineChangedEvents = events.filter((e) => e.type === "deadline_changed");
+  const latestDeadlineChanged = deadlineChangedEvents[deadlineChangedEvents.length - 1];
 
   const flags: Flag[] = [];
   const clarifications: Clarification[] = [];
@@ -107,6 +156,7 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
     const supported =
       ev != null &&
       name != null &&
+      isNearEvents(ev, eventIndices, utteranceIndex) &&
       ((ev.speakerName != null && normalize(ev.speakerName) === normalize(name)) || containsPhrase(ev.quote, name));
     if (supported) verified.owner = { status: "agreed", name, evidence: ev };
     else flags.push("owner_unverified");
@@ -123,7 +173,9 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
   } else if (isActive && x.deadline.status === "agreed") {
     const ev = locate(x.deadline.evidence, "deadline");
     const wording = x.deadline.wording;
-    if (ev && wording && containsPhrase(ev.quote, wording)) {
+    const near = ev != null && isNearEvents(ev, eventIndices, utteranceIndex);
+    const stale = ev != null && latestDeadlineChanged != null && ev.start < latestDeadlineChanged.start;
+    if (ev && wording && near && !stale && containsPhrase(ev.quote, wording)) {
       const anchor = x.deadline.anchor_utterance_id
         ? t.utterances.find((u) => u.id === x.deadline.anchor_utterance_id)
         : undefined;

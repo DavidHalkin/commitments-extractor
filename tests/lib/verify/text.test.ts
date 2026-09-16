@@ -52,4 +52,12 @@ describe("findQuoteSpan", () => {
   it("returns null for empty quotes", () => {
     expect(findQuoteSpan("  ", ws)).toBeNull();
   });
+  it("rejects a source utterance that adds a negation not in the quote", () => {
+    const neg = words("I will not write the API docs by Wednesday");
+    expect(findQuoteSpan("I will write the API docs by Wednesday", neg)).toBeNull();
+  });
+  it("still finds an exact quote that itself contains a hedge or negation token", () => {
+    const hedge = words("We could also redo the landing page");
+    expect(findQuoteSpan("We could also redo the landing page", hedge)).toEqual({ first: 0, last: 6 });
+  });
 });

@@ -53,6 +53,25 @@ export function fuzzyContainsPhrase(haystack: string, needle: string, maxEdits?:
 
 export type WordSpan = { first: number; last: number };
 
+/** Tokens that flip or soften a commitment; a non-exact quote match may not introduce one absent from the quote. */
+export const NEGATIONS = new Set([
+  "not",
+  "no",
+  "never",
+  "dont",
+  "cant",
+  "wont",
+  "cannot",
+  "isnt",
+  "arent",
+  "doesnt",
+  "didnt",
+  "shouldnt",
+  "wouldnt",
+  "couldnt",
+]);
+export const HEDGES = new Set(["could", "maybe", "might", "perhaps", "probably"]);
+
 export function findQuoteSpan(
   quote: string,
   words: { punctuated: string }[],
@@ -60,6 +79,7 @@ export function findQuoteSpan(
 ): WordSpan | null {
   const q = tokens(quote);
   if (!q.length) return null;
+  const qSet = new Set(q);
   const flat: { tok: string; wordIndex: number }[] = [];
   words.forEach((w, wordIndex) => tokens(w.punctuated).forEach((tok) => flat.push({ tok, wordIndex })));
   const qs = q.join(" ");
@@ -69,7 +89,12 @@ export function findQuoteSpan(
     for (let i = 0; i + size <= flat.length; i++) {
       const win = flat.slice(i, i + size);
       const ws = win.map((x) => x.tok).join(" ");
-      const score = ws === qs ? 1 : similarity(ws, qs);
+      const isExact = ws === qs;
+      if (!isExact) {
+        const addsNegationOrHedge = win.some((x) => (NEGATIONS.has(x.tok) || HEDGES.has(x.tok)) && !qSet.has(x.tok));
+        if (addsNegationOrHedge) continue;
+      }
+      const score = isExact ? 1 : similarity(ws, qs);
       if (score >= minSimilarity && (!best || score > best.score)) {
         best = { span: { first: win[0].wordIndex, last: win[win.length - 1].wordIndex }, score };
       }

@@ -180,3 +180,94 @@ describe("verify: statuses and clarifications", () => {
     expect(r.status).toBe("no_commitments");
   });
 });
+
+describe("verify: contradicted status, unrelated evidence, hedged acceptance", () => {
+  it("drops an active task whose latest verified event is a later cancellation", () => {
+    const r = run([
+      item({
+        events: [
+          { type: "accepted", utterance_id: "u4", quote: "I'll write the API docs by Wednesday" },
+          { type: "cancelled", utterance_id: "u9", quote: "Let's drop the survey" },
+        ],
+      }),
+    ]);
+    expect(r.items).toHaveLength(0);
+    expect(r.dropped[0].reason).toContain("contradicts");
+  });
+
+  it("rejects owner evidence from an utterance unrelated to the item's events", () => {
+    const r = run([
+      item({ owner: { status: "agreed", name: "Mark", evidence: { utterance_id: "u2", quote: "Hi, I'm Mark, the developer" } } }),
+    ]);
+    expect(r.items[0].owner).toMatchObject({ status: "none", name: null, evidence: null });
+    expect(r.items[0].flags).toContain("owner_unverified");
+  });
+
+  it("rejects a deadline evidenced before the latest deadline change but keeps one after it", () => {
+    const dt = makeTranscript([
+      [0, "Hi, I'm Anna, the project manager."], // u1
+      [1, "Hi, I'm Mark, the developer."], // u2
+      [0, "The demo is on Thursday."], // u3
+      [1, "Actually, let's move the demo to Friday."], // u4
+      [0, "Okay, the demo is on Friday then."], // u5
+    ]);
+    const dtSpeakers: Extraction["speakers"] = [
+      { speaker: 0, name: "Anna", intro_utterance_id: "u1" },
+      { speaker: 1, name: "Mark", intro_utterance_id: "u2" },
+    ];
+    const demoItem = (deadline: ExtractedItem["deadline"]): ExtractedItem => ({
+      kind: "task",
+      summary: "Demo",
+      final_status: "active",
+      owner: { status: "none", name: null, evidence: null },
+      deadline,
+      events: [
+        { type: "deadline_changed", utterance_id: "u4", quote: "let's move the demo to Friday" },
+        { type: "accepted", utterance_id: "u5", quote: "the demo is on Friday then" },
+      ],
+    });
+
+    const stale = verify(dt, {
+      speakers: dtSpeakers,
+      no_commitments_discussed: false,
+      items: [
+        demoItem({
+          status: "agreed",
+          wording: "on Thursday",
+          evidence: { utterance_id: "u3", quote: "The demo is on Thursday" },
+          resolved_date: null,
+          anchor_utterance_id: null,
+        }),
+      ],
+    });
+    expect(stale.items[0].deadline).toMatchObject({ status: "none", wording: null });
+    expect(stale.items[0].flags).toContain("deadline_unverified");
+
+    const fresh = verify(dt, {
+      speakers: dtSpeakers,
+      no_commitments_discussed: false,
+      items: [
+        demoItem({
+          status: "agreed",
+          wording: "on Friday",
+          evidence: { utterance_id: "u5", quote: "on Friday" },
+          resolved_date: null,
+          anchor_utterance_id: null,
+        }),
+      ],
+    });
+    expect(fresh.items[0].deadline).toMatchObject({ status: "agreed", wording: "on Friday" });
+    expect(fresh.items[0].flags).not.toContain("deadline_unverified");
+  });
+
+  it("does not count a hedged acceptance toward active-status support", () => {
+    const r = run([
+      item({
+        summary: "Redo landing page",
+        events: [{ type: "accepted", utterance_id: "u5", quote: "We could also redo the landing page" }],
+      }),
+    ]);
+    expect(r.items).toHaveLength(0);
+    expect(r.status).toBe("declined");
+  });
+});

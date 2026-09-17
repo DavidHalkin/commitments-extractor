@@ -20,7 +20,7 @@ deployed infrastructure is thrown away.
 |---|---|
 | Hosting | Vercel, Next.js on Fluid compute, region `iad1` for functions and the Blob store |
 | Reasoning client | AI SDK 7 (`ai` package), `generateText` + `Output.object` with the existing zod `ExtractionSchema` |
-| Model selection | `EXTRACT_MODEL` env var holding an AI Gateway model id; default `anthropic/claude-sonnet-5` |
+| Model selection | `EXTRACT_MODEL` env var holding an AI Gateway model id; default `openai/gpt-5-mini` (free AI Gateway tier refuses Claude Sonnet 5; see `docs/decisions/2026-09-17-extraction-model.md`) |
 | Gateway auth | OIDC on Vercel deployments; `AI_GATEWAY_API_KEY` locally and for `npm run eval` |
 | Storage | One private Vercel Blob store (`iad1`); `STORE_DRIVER=blob` in production, `local` for development and tests |
 | Browser upload | Presigned `PUT` URL (`issueSignedToken` + `presignUrl`), size capped at 35 MB by the URL |

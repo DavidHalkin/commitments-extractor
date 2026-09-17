@@ -7,6 +7,8 @@ import { scoreCase, type CaseScore, type Expected, type LineOffset } from "@/scr
 const arg = (name: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const CASES = ["01-normal", "02-changed", "03-clarify"];
 const runsPerCase = Number(arg("runs") ?? 3);
+// Seconds to wait between runs; the AI Gateway free tier rate-limits each model.
+const pauseSec = Number(arg("pause") ?? 0);
 // EXTRACT_MODEL is read when lib/extract/llm.ts loads, so the override must precede the pipeline import.
 const modelOverride = arg("model");
 if (modelOverride) process.env.EXTRACT_MODEL = modelOverride;
@@ -35,6 +37,7 @@ for (const name of CASES) {
   const offsets = JSON.parse(await readFile(path.join(dir, "offsets.json"), "utf8")) as LineOffset[];
   const bytes = new Uint8Array(await readFile(path.join(dir, "audio.mp3")));
   for (let i = 1; i <= runsPerCase; i++) {
+    if (results.length > 0 && pauseSec > 0) await new Promise((r) => setTimeout(r, pauseSec * 1000));
     const t0 = performance.now();
     try {
       const r = await processAudio(bytes);

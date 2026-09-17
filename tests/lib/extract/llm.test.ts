@@ -24,10 +24,10 @@ const ok: GenerateResult = {
     gateway: {
       cost: "0.004",
       generationId: "gen_1",
-      routing: { finalProvider: "anthropic", resolvedProviderApiModelId: "claude-sonnet-5" },
+      routing: { finalProvider: "openai", resolvedProviderApiModelId: "gpt-5-mini" },
     },
   },
-  response: { modelId: "anthropic/claude-sonnet-5" },
+  response: { modelId: "openai/gpt-5-mini" },
 };
 
 const noGatewayMetadata: GenerateResult = { ...ok, providerMetadata: undefined };
@@ -36,7 +36,7 @@ function noObject(inputTokens: number, outputTokens: number, finishReason: "leng
   return new NoObjectGeneratedError({
     message: "No object generated: response did not match schema.",
     text: '{"speakers": [',
-    response: { id: "r1", timestamp: new Date(0), modelId: "anthropic/claude-sonnet-5" },
+    response: { id: "r1", timestamp: new Date(0), modelId: "openai/gpt-5-mini" },
     usage: { inputTokens, outputTokens } as LanguageModelUsage,
     finishReason,
   });
@@ -55,11 +55,11 @@ describe("extractCommitments", () => {
       outputTokens: 200,
       costUsd: 0.004,
       costSource: "gateway",
-      model: "anthropic/claude-sonnet-5",
+      model: "openai/gpt-5-mini",
       generationId: "gen_1",
     });
     const request = generate.mock.calls[0][0];
-    expect(request.model).toBe("anthropic/claude-sonnet-5");
+    expect(request.model).toBe("openai/gpt-5-mini");
     expect(request.prompt).toContain("[u1] Speaker 0");
     expect(request.maxRetries).toBe(0);
     expect(request.output).toBeDefined();
@@ -68,15 +68,15 @@ describe("extractCommitments", () => {
   it("estimates cost from tokens when the Gateway reports none", async () => {
     const result = await extractCommitments(transcript, fakeGenerate([noGatewayMetadata]));
     expect(result.attempts[0].costSource).toBe("estimated");
-    expect(result.attempts[0].costUsd).toBeCloseTo((1000 * 2 + 200 * 10) / 1e6, 9);
-    expect(result.attempts[0].model).toBe("anthropic/claude-sonnet-5");
+    expect(result.attempts[0].costUsd).toBeCloseTo((1000 * 0.25 + 200 * 2) / 1e6, 9);
+    expect(result.attempts[0].model).toBe("openai/gpt-5-mini");
   });
 
   it("retries once when the output is truncated, counting both attempts' tokens", async () => {
     const result = await extractCommitments(transcript, fakeGenerate([noObject(1000, 16000, "length"), ok]));
     expect(result.attempts.map((a) => a.ok)).toEqual([false, true]);
     expect(result.attempts[0]).toMatchObject({ inputTokens: 1000, outputTokens: 16000, finishReason: "length", costSource: "estimated" });
-    expect(result.attempts[0].costUsd).toBeCloseTo((1000 * 2 + 16000 * 10) / 1e6, 9);
+    expect(result.attempts[0].costUsd).toBeCloseTo((1000 * 0.25 + 16000 * 2) / 1e6, 9);
   });
 
   it("throws ExtractionError with attempts after two failures, preserving real token usage", async () => {

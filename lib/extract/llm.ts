@@ -4,8 +4,8 @@ import { ExtractionSchema, type Extraction } from "@/lib/extract/schema";
 import { PRICING } from "@/lib/pricing";
 import type { LlmCostSource, Transcript } from "@/lib/types";
 
-/** An AI Gateway model id, e.g. "anthropic/claude-sonnet-5" or "openai/gpt-6-astra". */
-export const EXTRACT_MODEL = process.env.EXTRACT_MODEL ?? "anthropic/claude-sonnet-5";
+/** An AI Gateway model id; see docs/decisions/2026-09-17-extraction-model.md for why the default is openai/gpt-5-mini. */
+export const EXTRACT_MODEL = process.env.EXTRACT_MODEL ?? "openai/gpt-5-mini";
 const MAX_ATTEMPTS = 2;
 const NON_RETRYABLE_STATUS = [400, 401, 403, 404];
 

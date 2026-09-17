@@ -9,6 +9,7 @@ export const PRICING = {
   },
   llmFallback: {
     models: {
+      "openai/gpt-5-mini": { inputPerMTok: 0.25, outputPerMTok: 2 },
       "anthropic/claude-sonnet-5": { inputPerMTok: 2, outputPerMTok: 10 },
       "anthropic/claude-opus-5": { inputPerMTok: 5, outputPerMTok: 25 },
     } as Record<string, { inputPerMTok: number; outputPerMTok: number }>,

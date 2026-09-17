@@ -11,7 +11,7 @@ import type {
   Utterance,
   VerifiedItem,
 } from "@/lib/types";
-import { containsPhrase, findQuoteSpan, HEDGES, normalize, tokens } from "@/lib/verify/text";
+import { containsPhrase, findQuoteSpan, HEDGES, isDeferral, normalize, tokens } from "@/lib/verify/text";
 
 const MONTH = "(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)";
 const ABSOLUTE_DATE = new RegExp(
@@ -39,11 +39,38 @@ const STATE_EVENT_STATUS: Partial<Record<EventType, ExtractedItem["final_status"
   proposed: "not_accepted",
 };
 
-/** Event types whose evidence quote must not merely hedge or propose to count as real commitment support. */
+/** Event types whose evidence quote must not merely hedge, propose or postpone to count as real commitment support. */
 const HEDGE_SENSITIVE_EVENTS = new Set<EventType>(["accepted", "assigned"]);
 
 function isHedgedQuote(quote: string): boolean {
   return tokens(quote).some((tok) => HEDGES.has(tok));
+}
+
+/** A quote that hedges or postpones settles nothing, so it supports neither an agreement nor a deadline. */
+function settlesNothing(quote: string): boolean {
+  return isHedgedQuote(quote) || isDeferral(quote);
+}
+
+/** Words too generic to identify what an item is about. */
+const SUBJECT_STOPWORDS = new Set([
+  "the", "a", "an", "this", "that", "these", "those", "it", "its", "our", "their", "his", "her", "my", "your",
+  "and", "or", "for", "to", "of", "in", "on", "at", "by", "with", "from", "about", "into", "out", "up", "off",
+  "again", "also", "still", "just", "new", "one", "two", "who", "when", "what", "whether",
+]);
+
+/** The words that name what an item is about: its significant words apart from the leading one, usually a verb. */
+function subjectTokens(summary: string): string[] {
+  return tokens(summary)
+    .filter((tok) => tok.length > 2 && !SUBJECT_STOPWORDS.has(tok))
+    .slice(1);
+}
+
+/** A commitment must be identifiable from its own quotes, not only from the summary the model wrote. */
+function namesSubject(summary: string, quotes: string[]): boolean {
+  const subject = subjectTokens(summary);
+  if (subject.length === 0) return true;
+  const said = new Set(quotes.flatMap((q) => tokens(q)));
+  return subject.some((tok) => said.has(tok));
 }
 
 /** An owner/deadline evidence utterance must sit within one utterance of one of the item's own timeline events. */
@@ -99,7 +126,7 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
 
   const needed = SUPPORT[x.final_status];
   const supportingEvents = events.filter(
-    (e) => needed.includes(e.type as EventType) && !(HEDGE_SENSITIVE_EVENTS.has(e.type as EventType) && isHedgedQuote(e.quote)),
+    (e) => needed.includes(e.type as EventType) && !(HEDGE_SENSITIVE_EVENTS.has(e.type as EventType) && settlesNothing(e.quote)),
   );
   if (supportingEvents.length === 0) {
     return { dropped: `no verified quote for a ${needed.join(" or ")} event supporting status "${x.final_status}"` };
@@ -136,11 +163,21 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
     events,
   };
 
+  const finish = (): Processed => {
+    const quotes = [
+      ...verified.events.map((e) => e.quote),
+      ...(verified.owner.evidence ? [verified.owner.evidence.quote] : []),
+      ...(verified.deadline.evidence ? [verified.deadline.evidence.quote] : []),
+    ];
+    if (!namesSubject(x.summary, quotes)) flags.push("evidence_unspecific");
+    return { item: verified, clarifications };
+  };
+
   if (x.final_status === "open") {
     clarifications.push({ about: "question", itemSummary: x.summary, question: x.summary, evidence: lastEvent });
-    return { item: verified, clarifications };
+    return finish();
   }
-  if (x.final_status === "cancelled") return { item: verified, clarifications };
+  if (x.final_status === "cancelled") return finish();
 
   const isActive = x.final_status === "active";
 
@@ -175,7 +212,7 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
     const wording = x.deadline.wording;
     const near = ev != null && isNearEvents(ev, eventIndices, utteranceIndex);
     const stale = ev != null && latestDeadlineChanged != null && ev.start < latestDeadlineChanged.start;
-    if (ev && wording && near && !stale && containsPhrase(ev.quote, wording)) {
+    if (ev && wording && near && !stale && !isDeferral(ev.quote) && containsPhrase(ev.quote, wording)) {
       const anchor = x.deadline.anchor_utterance_id
         ? t.utterances.find((u) => u.id === x.deadline.anchor_utterance_id)
         : undefined;
@@ -189,7 +226,7 @@ function processItem(x: ExtractedItem, t: Transcript, locate: Locate): Processed
     flags.push("deadline_missing");
   }
 
-  return { item: verified, clarifications };
+  return finish();
 }
 
 export function verify(t: Transcript, x: Extraction): Report {

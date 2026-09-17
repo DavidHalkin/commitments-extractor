@@ -19,6 +19,7 @@ const FLAG_TEXT: Record<Flag, string> = {
   deadline_disputed: "Deadline disputed — not settled",
   deadline_unverified: "Deadline not supported by a quote — removed",
   date_context_missing: "Relative date: the recording does not state the calendar date",
+  evidence_unspecific: "Supporting quotes do not name the subject — listen to the segment",
 };
 
 const EVENT_LABEL: Record<string, string> = {

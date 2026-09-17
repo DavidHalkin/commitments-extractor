@@ -3,6 +3,7 @@ import {
   containsPhrase,
   findQuoteSpan,
   fuzzyContainsPhrase,
+  isDeferral,
   levenshtein,
   normalize,
 } from "@/lib/verify/text";
@@ -59,5 +60,20 @@ describe("findQuoteSpan", () => {
   it("still finds an exact quote that itself contains a hedge or negation token", () => {
     const hedge = words("We could also redo the landing page");
     expect(findQuoteSpan("We could also redo the landing page", hedge)).toEqual({ first: 0, last: 6 });
+  });
+});
+
+describe("isDeferral", () => {
+  it("recognizes postponing the decision or the discussion", () => {
+    expect(isDeferral("Okay, let's pick this up next week.")).toBe(true);
+    expect(isDeferral("Maybe. Let's talk about it another time.")).toBe(true);
+    expect(isDeferral("I don't know yet. Let's decide later.")).toBe(true);
+    expect(isDeferral("Let's come back to this.")).toBe(true);
+  });
+
+  it("does not treat a commitment or a plain date as a deferral", () => {
+    expect(isDeferral("I'll write the API docs by Wednesday.")).toBe(false);
+    expect(isDeferral("The client demo is on Friday then.")).toBe(false);
+    expect(isDeferral("I'll send it out later.")).toBe(false);
   });
 });

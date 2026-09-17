@@ -47,7 +47,8 @@ export type Flag =
   | "deadline_missing"
   | "deadline_disputed"
   | "deadline_unverified"
-  | "date_context_missing";
+  | "date_context_missing"
+  | "evidence_unspecific";
 
 export type AgreementStatus = "agreed" | "none" | "disputed";
 export type FinalStatus = "active" | "cancelled" | "not_accepted" | "open";

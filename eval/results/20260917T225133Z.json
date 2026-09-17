@@ -1,0 +1,5544 @@
+[
+  {
+    "case": "01-normal",
+    "run": 1,
+    "totalMs": 46902.695400000004,
+    "stageMs": {
+      "file-check": 101.65610000000004,
+      "transcribe": 2318.802,
+      "precheck": 0.1020000000003165,
+      "extract": 44472.2358,
+      "verify": 9.441299999998591
+    },
+    "usage": {
+      "audioSeconds": 75.575935,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1909,
+      "llmOutputTokens": 4023,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.00812005,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.005416275341666667,
+      "reasoning": 0.00812005,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.013536325341666667,
+      "perAudioMinute": 0.010746536189066003
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.9"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "18.9, 22.3, 22.3"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo on Friday"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "35.1 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "26.6, 29.2, 35.1"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got cancelled, expected cancelled"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "37.9, 47.2"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "53.0 s “Yes. Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "49.7, 53.0, 53.0"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "56.9, 62.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@62.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 62.32,
+            "end": 65.92
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 5.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 5.3599997,
+            "end": 9.599999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we could also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.92,
+              "end": 12.799999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Write the API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "The API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.904999,
+              "end": 21.864998
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            },
+            {
+              "type": "deadline_set",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Client demo on Friday",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 35.050003,
+              "end": 37.45
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 26.570002,
+              "end": 28.57
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday? The staging server won't be ready by Thursday.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 29.210001,
+              "end": 34.57
+            },
+            {
+              "type": "accepted",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 35.050003,
+              "end": 37.45
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Send out the customer survey",
+          "finalStatus": "cancelled",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "assigned",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 37.875,
+              "end": 42.114998
+            },
+            {
+              "type": "cancelled",
+              "quote": "You're right. Let's drop the survey.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.155,
+              "end": 49.554996
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 49.714996,
+              "end": 52.515
+            },
+            {
+              "type": "accepted",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "One more thing. Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 56.879997,
+              "end": 61.92
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 62.32,
+              "end": 65.92
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "01-normal",
+    "run": 2,
+    "totalMs": 5806.555099999998,
+    "stageMs": {},
+    "usage": {},
+    "cost": {},
+    "score": null,
+    "error": "Extraction failed after 2 attempts"
+  },
+  {
+    "case": "01-normal",
+    "run": 3,
+    "totalMs": 8456.518200000006,
+    "stageMs": {},
+    "usage": {},
+    "cost": {},
+    "score": null,
+    "error": "Extraction failed after 2 attempts"
+  },
+  {
+    "case": "01-normal",
+    "run": 4,
+    "totalMs": 2701.199800000002,
+    "stageMs": {},
+    "usage": {},
+    "cost": {},
+    "score": null,
+    "error": "Extraction failed after 2 attempts"
+  },
+  {
+    "case": "01-normal",
+    "run": 5,
+    "totalMs": 70048.59480000002,
+    "stageMs": {
+      "file-check": 2.6626999999862164,
+      "transcribe": 6894.609200000006,
+      "precheck": 0.00989999997545965,
+      "extract": 63147.859800000006,
+      "verify": 3.362200000003213
+    },
+    "usage": {
+      "audioSeconds": 75.575935,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1909,
+      "llmOutputTokens": 5008,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.01009005,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.005416275341666667,
+      "reasoning": 0.01009005,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.015506325341666667,
+      "perAudioMinute": 0.012310526101992651
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.9"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "18.9, 22.3, 22.3"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "client demo"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "35.1 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "26.6, 29.2, 35.1"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got cancelled, expected cancelled"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "37.9, 47.2"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "53.0 s “Yes. Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "49.7, 53.0, 53.0"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.5, 62.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@62.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 62.32,
+            "end": 65.92
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 5.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 5.3599997,
+            "end": 9.599999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we could also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.92,
+              "end": 12.799999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "The API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.904999,
+              "end": 21.864998
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            },
+            {
+              "type": "deadline_set",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 22.345,
+              "end": 24.904999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "client demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 35.050003,
+              "end": 37.45
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "deadline_set",
+              "quote": "The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 26.570002,
+              "end": 28.57
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday? The staging server won't be ready by Thursday.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 29.210001,
+              "end": 34.57
+            },
+            {
+              "type": "accepted",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 35.050003,
+              "end": 37.45
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "customer survey",
+          "finalStatus": "cancelled",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "assigned",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 37.875,
+              "end": 42.114998
+            },
+            {
+              "type": "cancelled",
+              "quote": "You're right. Let's drop the survey.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.155,
+              "end": 49.554996
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 49.714996,
+              "end": 52.515
+            },
+            {
+              "type": "accepted",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 52.96,
+              "end": 56.48
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 58.48,
+              "end": 61.92
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 62.32,
+              "end": 65.92
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 1,
+    "totalMs": 56308.9779,
+    "stageMs": {
+      "file-check": 2.551000000035856,
+      "transcribe": 1975.2928999999422,
+      "precheck": 0.00849999999627471,
+      "extract": 54327.54329999996,
+      "verify": 3.490300000004936
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1913,
+      "llmOutputTokens": 5574,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.01122305,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.01122305,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01670812527,
+      "perAudioMinute": 0.01309825939015783
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation / API docs"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "18.2, 21.2, 21.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.8 s “The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "25.6, 28.0, 36.8, 36.8"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": true,
+          "detail": "got Anna, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "49.6 s “I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 43.0, 49.6"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "55.2 s “Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 55.2, 55.2"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "59.5, 63.2"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@63.2"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 63.23,
+            "end": 67.23
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.24,
+            "end": 3.9999998
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 4.4,
+            "end": 8.959999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we can also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.28,
+              "end": 12.559999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Write the API documentation / API docs",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "the API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.205,
+              "end": 20.845
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            },
+            {
+              "type": "deadline_set",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Client demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "deadline_set",
+              "quote": "The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.645,
+              "end": 27.244999
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday?",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.029999,
+              "end": 31.63
+            },
+            {
+              "type": "accepted",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            },
+            {
+              "type": "deadline_changed",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Send out the customer survey",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Anna",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 49.575,
+              "end": 51.094997
+            }
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [
+            "deadline_missing"
+          ],
+          "events": [
+            {
+              "type": "assigned",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 39.309998,
+              "end": 42.67
+            },
+            {
+              "type": "question_raised",
+              "quote": "Do we still need it?",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 43.015,
+              "end": 44.614998
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 49.575,
+              "end": 51.094997
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 51.735,
+              "end": 54.295
+            },
+            {
+              "type": "accepted",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 59.55,
+              "end": 62.75
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 63.23,
+              "end": 67.23
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 2,
+    "totalMs": 64077.874499999976,
+    "stageMs": {
+      "file-check": 3.023499999952037,
+      "transcribe": 7615.666100000031,
+      "precheck": 0.012099999992642552,
+      "extract": 56456.6421,
+      "verify": 2.438200000033248
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1913,
+      "llmOutputTokens": 3948,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.00797105,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.00797105,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01345612527,
+      "perAudioMinute": 0.010548868668670067
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 5,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "17.4, 21.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": false,
+          "detail": "no item has a quote containing the anchor"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": true,
+          "detail": "got Anna, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "47.8 s “Let's keep the survey anyway. I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 47.8"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "54.5 s “Yes. Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 54.5, 54.5"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.0, 63.2"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@63.2"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 63.23,
+            "end": 67.23
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.24,
+            "end": 3.9999998
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 4.4,
+            "end": 8.959999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we can also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.28,
+              "end": 12.559999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Write the API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Next, the API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.405,
+              "end": 20.845
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Send out the customer survey",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Anna",
+            "evidence": {
+              "type": "owner",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [
+            "deadline_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 39.309998,
+              "end": 42.67
+            },
+            {
+              "type": "assigned",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 51.735,
+              "end": 54.295
+            },
+            {
+              "type": "accepted",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "One more thing. Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 57.95,
+              "end": 62.75
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 63.23,
+              "end": 67.23
+            }
+          ]
+        }
+      ],
+      "dropped": [
+        {
+          "summary": "Client demo (move to Friday)",
+          "reason": "no verified quote for a accepted or assigned event supporting status \"active\""
+        }
+      ],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 3,
+    "totalMs": 61139.19230000005,
+    "stageMs": {
+      "file-check": 2.924300000013318,
+      "transcribe": 1576.8121999999858,
+      "precheck": 0.008400000049732625,
+      "extract": 59556.06170000002,
+      "verify": 3.298799999989569
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1913,
+      "llmOutputTokens": 3989,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.00805305,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.00805305,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01353812527,
+      "perAudioMinute": 0.010613152198547679
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "18.2, 21.2, 21.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo scheduled (date)"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.8 s “The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "25.6, 28.0, 36.8, 36.8"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": true,
+          "detail": "got Anna, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "49.6 s “I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 49.6"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "55.2 s “Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 55.2, 55.2"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Whether the budget for the extra servers has been approved"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "59.5, 64.8"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@64.8"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Whether the budget for the extra servers has been approved",
+          "question": "Whether the budget for the extra servers has been approved",
+          "evidence": {
+            "type": "left_open",
+            "quote": "Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 64.75,
+            "end": 67.23
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.24,
+            "end": 3.9999998
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 4.4,
+            "end": 8.959999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we can also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.28,
+              "end": 12.559999
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Write the API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "the API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.205,
+              "end": 20.845
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            },
+            {
+              "type": "deadline_set",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Client demo scheduled (date)",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.645,
+              "end": 27.244999
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday? The staging server won't be ready by Thursday.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.029999,
+              "end": 35.789997
+            },
+            {
+              "type": "accepted",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            },
+            {
+              "type": "deadline_changed",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 51.735,
+              "end": 54.295
+            },
+            {
+              "type": "accepted",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 55.175,
+              "end": 57.254997
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Send out the customer survey",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Anna",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 49.575,
+              "end": 51.094997
+            }
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [
+            "deadline_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 39.309998,
+              "end": 42.67
+            },
+            {
+              "type": "accepted",
+              "quote": "I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 49.575,
+              "end": 51.094997
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Whether the budget for the extra servers has been approved",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 59.55,
+              "end": 62.75
+            },
+            {
+              "type": "left_open",
+              "quote": "Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 64.75,
+              "end": 67.23
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 4,
+    "totalMs": 55243.38170000003,
+    "stageMs": {
+      "file-check": 3.6330999999772757,
+      "transcribe": 6965.669800000032,
+      "precheck": 0.012199999997392297,
+      "extract": 48271.1320000001,
+      "verify": 2.6881999999750406
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1913,
+      "llmOutputTokens": 4978,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.01003105,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.01003105,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01551612527,
+      "perAudioMinute": 0.01216379637047351
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3, 13.2"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "write the API docs / API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "16.4, 21.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "client demo date (scheduled)"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.4 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "24.7, 28.0, 36.4, 68.0"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": true,
+          "detail": "got Anna, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "47.8 s “Let's keep the survey anyway. I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 47.8"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "54.5 s “Yes. Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 54.5"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.0, 63.2"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@63.2"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 63.23,
+            "end": 67.23
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.24,
+            "end": 3.9999998
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 4.4,
+            "end": 8.959999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we can also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.28,
+              "end": 12.559999
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe later. Let's not add that now.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 13.165,
+              "end": 16.125
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "write the API docs / API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Fine. Next, the API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 16.365,
+              "end": 20.845
+            },
+            {
+              "type": "assigned",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "client demo date (scheduled)",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.35,
+              "end": 38.91
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "deadline_set",
+              "quote": "Great. Thanks. The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 24.685001,
+              "end": 27.244999
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday? The staging server won't be ready by Thursday.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.029999,
+              "end": 35.789997
+            },
+            {
+              "type": "accepted",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.35,
+              "end": 38.91
+            },
+            {
+              "type": "accepted",
+              "quote": "Okay. So the docs for me by Wednesday, and the demo on Friday. Right.",
+              "utteranceId": "u16",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 67.950874,
+              "end": 75.39087
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "send out the customer survey",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Anna",
+            "evidence": {
+              "type": "owner",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [
+            "deadline_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 39.309998,
+              "end": 42.67
+            },
+            {
+              "type": "assigned",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 51.735,
+              "end": 54.295
+            },
+            {
+              "type": "accepted",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "One more thing. Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 57.95,
+              "end": 62.75
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 63.23,
+              "end": 67.23
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 5,
+    "totalMs": 42322.93599999999,
+    "stageMs": {
+      "file-check": 2.800899999914691,
+      "transcribe": 1761.7606000000378,
+      "precheck": 0.009799999999813735,
+      "extract": 40554.897600000026,
+      "verify": 3.333299999940209
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1913,
+      "llmOutputTokens": 4472,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.00901905,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.00901905,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.014504125270000001,
+      "perAudioMinute": 0.011370443538325411
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3, 13.2"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "17.4, 21.2, 21.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.8 s “The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "24.7, 28.0, 36.4, 36.4"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": true,
+          "detail": "got Anna, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "47.8 s “Let's keep the survey anyway. I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 47.8"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "54.5 s “Yes. Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 54.5, 54.5"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.0, 63.2"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@63.2"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "question",
+          "itemSummary": "Has the budget for the extra servers been approved?",
+          "question": "Has the budget for the extra servers been approved?",
+          "evidence": {
+            "type": "left_open",
+            "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+            "utteranceId": "u15",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 63.23,
+            "end": 67.23
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager. Let's go through the launch plan.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.24,
+            "end": 3.9999998
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi, Anna. Mark here. I'm the developer on the team.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 4.4,
+            "end": 8.959999
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Redo the landing page",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "First, we can also redo the landing page while we're at it.",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 9.28,
+              "end": 12.559999
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe later. Let's not add that now.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 13.165,
+              "end": 16.125
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Write the API documentation",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Mark",
+            "evidence": {
+              "type": "owner",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "by Wednesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          },
+          "flags": [
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Next, the API documentation is still missing.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.405,
+              "end": 20.845
+            },
+            {
+              "type": "assigned",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            },
+            {
+              "type": "deadline_set",
+              "quote": "I'll write the API docs by Wednesday.",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 21.244999,
+              "end": 24.285
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Client demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "on Friday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.829998,
+              "end": 38.91
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Great. Thanks. The client demo is on Thursday.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 24.685001,
+              "end": 27.244999
+            },
+            {
+              "type": "proposed",
+              "quote": "Actually, can we move the demo to Friday?",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.029999,
+              "end": 31.63
+            },
+            {
+              "type": "accepted",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.35,
+              "end": 38.91
+            },
+            {
+              "type": "deadline_changed",
+              "quote": "Okay. The client demo is on Friday then.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 36.35,
+              "end": 38.91
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Send the customer survey",
+          "finalStatus": "active",
+          "owner": {
+            "status": "agreed",
+            "name": "Anna",
+            "evidence": {
+              "type": "owner",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [
+            "deadline_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "About the customer survey I mentioned last week, I was going to send it out.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 39.309998,
+              "end": 42.67
+            },
+            {
+              "type": "accepted",
+              "quote": "Let's keep the survey anyway. I'll send it out myself.",
+              "utteranceId": "u11",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 47.815,
+              "end": 51.094997
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Book the room for the demo",
+          "finalStatus": "active",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "agreed",
+            "wording": "before next Tuesday",
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          },
+          "flags": [
+            "owner_missing",
+            "date_context_missing"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Someone needs to book the room for the demo.",
+              "utteranceId": "u12",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 51.735,
+              "end": 54.295
+            },
+            {
+              "type": "accepted",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            },
+            {
+              "type": "deadline_set",
+              "quote": "Yes. Someone should book the room before next Tuesday.",
+              "utteranceId": "u13",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 54.454998,
+              "end": 57.254997
+            }
+          ]
+        },
+        {
+          "kind": "open_question",
+          "summary": "Has the budget for the extra servers been approved?",
+          "finalStatus": "open",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "question_raised",
+              "quote": "One more thing. Has the budget for the extra servers been approved?",
+              "utteranceId": "u14",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 57.95,
+              "end": 62.75
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Finance hasn't answered, so that's still open.",
+              "utteranceId": "u15",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 63.23,
+              "end": 67.23
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "ok"
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 1,
+    "totalMs": 34977.95299999998,
+    "stageMs": {
+      "file-check": 3.464700000011362,
+      "transcribe": 2375.38049999997,
+      "precheck": 0.006199999945238233,
+      "extract": 32598.382400000002,
+      "verify": 0.6515000000363216
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1686,
+      "llmOutputTokens": 2501,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0050779,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0050779,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.007823015413333332,
+      "perAudioMinute": 0.012254117300112447
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@18.8, deadline@25.6"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@18.8, deadline@25.6"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: Take the client report this time",
+        "not_accepted: Update the road map"
+      ],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "owner",
+          "itemSummary": "Take the client report this time",
+          "question": "Who owns \"Take the client report this time\"?",
+          "evidence": {
+            "type": "owner",
+            "quote": "Let's see who has time.",
+            "utteranceId": "u5",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 18.835,
+            "end": 20.275
+          }
+        },
+        {
+          "about": "deadline",
+          "itemSummary": "Take the client report this time",
+          "question": "What is the deadline for \"Take the client report this time\"?",
+          "evidence": {
+            "type": "deadline",
+            "quote": "I don't know yet. Let's decide later.",
+            "utteranceId": "u7",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 25.61,
+            "end": 28.41
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 3.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "And I'm Mark, the developer.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 3.52,
+            "end": 5.36
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Take the client report this time",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "disputed",
+            "name": null,
+            "evidence": {
+              "type": "owner",
+              "quote": "Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.835,
+              "end": 20.275
+            }
+          },
+          "deadline": {
+            "status": "disputed",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          },
+          "flags": [
+            "owner_disputed",
+            "deadline_disputed"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Mark, can you take the client report this time?",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 8.24,
+              "end": 11.28
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure I can. My week is full. Maybe you could do it.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 11.5199995,
+              "end": 17.074999
+            },
+            {
+              "type": "left_open",
+              "quote": "Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.835,
+              "end": 20.275
+            },
+            {
+              "type": "question_raised",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Update the road map",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "We should probably update the road map too.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.650002,
+              "end": 32.010002
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe. Let's talk about it another time.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 32.33,
+              "end": 35.61
+            },
+            {
+              "type": "left_open",
+              "quote": "Okay. Let's pick this up next week.",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 36.170002,
+              "end": 37.85
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "needs_clarification"
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 2,
+    "totalMs": 36289.45570000005,
+    "stageMs": {
+      "file-check": 2.3705000000772998,
+      "transcribe": 1387.3636000000406,
+      "precheck": 0.006599999964237213,
+      "extract": 34898.64560000005,
+      "verify": 1.0318999999435619
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1686,
+      "llmOutputTokens": 3157,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0063899,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0063899,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.009135015413333333,
+      "perAudioMinute": 0.01430925857854399
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@17.4, deadline@25.6"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@17.4, deadline@25.6"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: Take the client report",
+        "not_accepted: Update the road map"
+      ],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "owner",
+          "itemSummary": "Take the client report",
+          "question": "Who owns \"Take the client report\"?",
+          "evidence": {
+            "type": "owner",
+            "quote": "I'm not sure either. Let's see who has time.",
+            "utteranceId": "u5",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 17.395,
+            "end": 20.275
+          }
+        },
+        {
+          "about": "deadline",
+          "itemSummary": "Take the client report",
+          "question": "What is the deadline for \"Take the client report\"?",
+          "evidence": {
+            "type": "deadline",
+            "quote": "I don't know yet. Let's decide later.",
+            "utteranceId": "u7",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 25.61,
+            "end": 28.41
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 3.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "And I'm Mark, the developer.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 3.52,
+            "end": 5.36
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Take the client report",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "disputed",
+            "name": null,
+            "evidence": {
+              "type": "owner",
+              "quote": "I'm not sure either. Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.395,
+              "end": 20.275
+            }
+          },
+          "deadline": {
+            "status": "disputed",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          },
+          "flags": [
+            "owner_disputed",
+            "deadline_disputed"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Mark, can you take the client report this time?",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 8.24,
+              "end": 11.28
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure I can. My week is full. Maybe you could do it.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 11.5199995,
+              "end": 17.074999
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure either. Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.395,
+              "end": 20.275
+            },
+            {
+              "type": "question_raised",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Update the road map",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "We should probably update the road map too.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.650002,
+              "end": 32.010002
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe. Let's talk about it another time.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 32.33,
+              "end": 35.61
+            },
+            {
+              "type": "left_open",
+              "quote": "Okay. Let's pick this up next week.",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 36.170002,
+              "end": 37.85
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "needs_clarification"
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 3,
+    "totalMs": 46754.623100000084,
+    "stageMs": {
+      "file-check": 2.004799999995157,
+      "transcribe": 1911.6463000000222,
+      "precheck": 0.007199999992735684,
+      "extract": 44839.83039999998,
+      "verify": 1.0973999999696389
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1686,
+      "llmOutputTokens": 3488,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0070519,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0070519,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.009797015413333332,
+      "perAudioMinute": 0.015346227729703808
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@18.8, deadline@20.8"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@18.8, deadline@20.8"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: client report",
+        "not_accepted: update the road map"
+      ],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "owner",
+          "itemSummary": "client report",
+          "question": "Who owns \"client report\"?",
+          "evidence": {
+            "type": "owner",
+            "quote": "Let's see who has time.",
+            "utteranceId": "u5",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 18.835,
+            "end": 20.275
+          }
+        },
+        {
+          "about": "deadline",
+          "itemSummary": "client report",
+          "question": "What is the deadline for \"client report\"?",
+          "evidence": {
+            "type": "deadline",
+            "quote": "And when is it due? Thursday or Friday?",
+            "utteranceId": "u6",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 20.755,
+            "end": 24.835
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 3.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "And I'm Mark, the developer.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 3.52,
+            "end": 5.36
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "client report",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "disputed",
+            "name": null,
+            "evidence": {
+              "type": "owner",
+              "quote": "Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.835,
+              "end": 20.275
+            }
+          },
+          "deadline": {
+            "status": "disputed",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            }
+          },
+          "flags": [
+            "owner_disputed",
+            "deadline_disputed"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Mark, can you take the client report this time?",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 8.24,
+              "end": 11.28
+            },
+            {
+              "type": "proposed",
+              "quote": "Maybe you could do it.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 15.474999,
+              "end": 17.074999
+            },
+            {
+              "type": "left_open",
+              "quote": "Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 18.835,
+              "end": 20.275
+            },
+            {
+              "type": "question_raised",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            },
+            {
+              "type": "left_open",
+              "quote": "Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 27.050001,
+              "end": 28.41
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "update the road map",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "We should probably update the road map too.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.650002,
+              "end": 32.010002
+            },
+            {
+              "type": "left_open",
+              "quote": "Let's talk about it another time.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 33.21,
+              "end": 35.61
+            },
+            {
+              "type": "left_open",
+              "quote": "Let's pick this up next week.",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 36.73,
+              "end": 37.85
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "needs_clarification"
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 4,
+    "totalMs": 30159.71710000001,
+    "stageMs": {
+      "file-check": 2.2330999999539927,
+      "transcribe": 3828.723100000061,
+      "precheck": 0.007199999992735684,
+      "extract": 26328.01700000011,
+      "verify": 0.6890999999595806
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1686,
+      "llmOutputTokens": 2780,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0056359,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0056359,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.008381015413333333,
+      "perAudioMinute": 0.01312817891090879
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@17.4, deadline@25.6"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@17.4, deadline@25.6"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: client report",
+        "not_accepted: update the road map"
+      ],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "owner",
+          "itemSummary": "client report",
+          "question": "Who owns \"client report\"?",
+          "evidence": {
+            "type": "owner",
+            "quote": "I'm not sure either. Let's see who has time.",
+            "utteranceId": "u5",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 17.395,
+            "end": 20.275
+          }
+        },
+        {
+          "about": "deadline",
+          "itemSummary": "client report",
+          "question": "What is the deadline for \"client report\"?",
+          "evidence": {
+            "type": "deadline",
+            "quote": "I don't know yet. Let's decide later.",
+            "utteranceId": "u7",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 25.61,
+            "end": 28.41
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 3.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "And I'm Mark, the developer.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 3.52,
+            "end": 5.36
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "client report",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "disputed",
+            "name": null,
+            "evidence": {
+              "type": "owner",
+              "quote": "I'm not sure either. Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.395,
+              "end": 20.275
+            }
+          },
+          "deadline": {
+            "status": "disputed",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          },
+          "flags": [
+            "owner_disputed",
+            "deadline_disputed"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Mark, can you take the client report this time?",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 8.24,
+              "end": 11.28
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure I can. My week is full. Maybe you could do it.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 11.5199995,
+              "end": 17.074999
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure either. Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.395,
+              "end": 20.275
+            },
+            {
+              "type": "question_raised",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "update the road map",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "We should probably update the road map too.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.650002,
+              "end": 32.010002
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe. Let's talk about it another time.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 32.33,
+              "end": 35.61
+            },
+            {
+              "type": "left_open",
+              "quote": "Okay. Let's pick this up next week.",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 36.170002,
+              "end": 37.85
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "needs_clarification"
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 5,
+    "totalMs": 29973.974400000065,
+    "stageMs": {
+      "file-check": 2.277200000011362,
+      "transcribe": 3921.3319999999367,
+      "precheck": 0.00849999999627471,
+      "extract": 26049.6608999999,
+      "verify": 0.6411000000080094
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1686,
+      "llmOutputTokens": 2859,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0057939,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0057939,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.008539015413333333,
+      "perAudioMinute": 0.013375673058768687
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@11.5, deadline@25.6"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@11.5, deadline@25.6"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: Take the client report",
+        "not_accepted: Update the road map"
+      ],
+      "sttMisses": []
+    },
+    "report": {
+      "declineReasons": [],
+      "clarifications": [
+        {
+          "about": "owner",
+          "itemSummary": "Take the client report",
+          "question": "Who owns \"Take the client report\"?",
+          "evidence": {
+            "type": "owner",
+            "quote": "I'm not sure I can. My week is full. Maybe you could do it.",
+            "utteranceId": "u4",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 11.5199995,
+            "end": 17.074999
+          }
+        },
+        {
+          "about": "deadline",
+          "itemSummary": "Take the client report",
+          "question": "What is the deadline for \"Take the client report\"?",
+          "evidence": {
+            "type": "deadline",
+            "quote": "I don't know yet. Let's decide later.",
+            "utteranceId": "u7",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 25.61,
+            "end": 28.41
+          }
+        }
+      ],
+      "speakers": [
+        {
+          "speaker": 0,
+          "name": "Anna",
+          "intro": {
+            "type": "intro",
+            "quote": "Hi. I'm Anna, the project manager.",
+            "utteranceId": "u1",
+            "speaker": 0,
+            "speakerName": "Anna",
+            "start": 0.08,
+            "end": 3.04
+          }
+        },
+        {
+          "speaker": 1,
+          "name": "Mark",
+          "intro": {
+            "type": "intro",
+            "quote": "And I'm Mark, the developer.",
+            "utteranceId": "u2",
+            "speaker": 1,
+            "speakerName": "Mark",
+            "start": 3.52,
+            "end": 5.36
+          }
+        }
+      ],
+      "items": [
+        {
+          "kind": "task",
+          "summary": "Take the client report",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "disputed",
+            "name": null,
+            "evidence": {
+              "type": "owner",
+              "quote": "I'm not sure I can. My week is full. Maybe you could do it.",
+              "utteranceId": "u4",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 11.5199995,
+              "end": 17.074999
+            }
+          },
+          "deadline": {
+            "status": "disputed",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": {
+              "type": "deadline",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          },
+          "flags": [
+            "owner_disputed",
+            "deadline_disputed"
+          ],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "Mark, can you take the client report this time?",
+              "utteranceId": "u3",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 8.24,
+              "end": 11.28
+            },
+            {
+              "type": "left_open",
+              "quote": "I'm not sure either. Let's see who has time.",
+              "utteranceId": "u5",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 17.395,
+              "end": 20.275
+            },
+            {
+              "type": "question_raised",
+              "quote": "And when is it due? Thursday or Friday?",
+              "utteranceId": "u6",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 20.755,
+              "end": 24.835
+            },
+            {
+              "type": "left_open",
+              "quote": "I don't know yet. Let's decide later.",
+              "utteranceId": "u7",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 25.61,
+              "end": 28.41
+            }
+          ]
+        },
+        {
+          "kind": "task",
+          "summary": "Update the road map",
+          "finalStatus": "not_accepted",
+          "owner": {
+            "status": "none",
+            "name": null,
+            "evidence": null
+          },
+          "deadline": {
+            "status": "none",
+            "wording": null,
+            "resolvedDate": null,
+            "evidence": null
+          },
+          "flags": [],
+          "events": [
+            {
+              "type": "proposed",
+              "quote": "We should probably update the road map too.",
+              "utteranceId": "u8",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 28.650002,
+              "end": 32.010002
+            },
+            {
+              "type": "left_open",
+              "quote": "Maybe. Let's talk about it another time.",
+              "utteranceId": "u9",
+              "speaker": 0,
+              "speakerName": "Anna",
+              "start": 32.33,
+              "end": 35.61
+            },
+            {
+              "type": "left_open",
+              "quote": "Okay. Let's pick this up next week.",
+              "utteranceId": "u10",
+              "speaker": 1,
+              "speakerName": "Mark",
+              "start": 36.170002,
+              "end": 37.85
+            }
+          ]
+        }
+      ],
+      "dropped": [],
+      "metrics": null,
+      "status": "needs_clarification"
+    }
+  }
+]

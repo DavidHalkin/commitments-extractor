@@ -72,6 +72,30 @@ export const NEGATIONS = new Set([
 ]);
 export const HEDGES = new Set(["could", "maybe", "might", "perhaps", "probably"]);
 
+/** Phrases that postpone an item by themselves. */
+const DEFERRAL_PHRASES = [
+  "pick this up",
+  "pick it up",
+  "pick that up",
+  "come back to",
+  "revisit",
+  "postpone",
+  "put it off",
+  "put this off",
+  "table it",
+  "park it",
+];
+/** A verb about deciding or discussing plus a postponing marker also defers: "let's decide later". */
+const DEFERRAL_VERBS = new Set(["decide", "discuss", "talk", "figure", "sort", "settle", "pick", "revisit"]);
+const POSTPONE_MARKERS = ["later", "another time", "next time", "some other time"];
+
+/** True when the text postpones the decision or the discussion instead of settling it. */
+export function isDeferral(text: string): boolean {
+  if (DEFERRAL_PHRASES.some((p) => containsPhrase(text, p))) return true;
+  const defersDecision = tokens(text).some((tok) => DEFERRAL_VERBS.has(tok));
+  return defersDecision && POSTPONE_MARKERS.some((m) => containsPhrase(text, m));
+}
+
 export function findQuoteSpan(
   quote: string,
   words: { punctuated: string }[],

@@ -271,3 +271,96 @@ describe("verify: contradicted status, unrelated evidence, hedged acceptance", (
     expect(r.status).toBe("declined");
   });
 });
+
+describe("verify: postponed items", () => {
+  const dt = makeTranscript([
+    [0, "Hi, I'm Anna, the project manager."], // u1
+    [1, "And I'm Mark, the developer."], // u2
+    [0, "We need to talk about the client report."], // u3
+    [1, "I'll update the roadmap."], // u4
+    [1, "Okay, let's pick this up next week."], // u5
+    [0, "Maybe. Let's talk about it another time."], // u6
+  ]);
+  const dtSpeakers: Extraction["speakers"] = [
+    { speaker: 0, name: "Anna", intro_utterance_id: "u1" },
+    { speaker: 1, name: "Mark", intro_utterance_id: "u2" },
+  ];
+  const dtRun = (items: ExtractedItem[]) =>
+    verify(dt, { speakers: dtSpeakers, no_commitments_discussed: false, items });
+
+  it("drops an active task whose acceptance only postpones the discussion", () => {
+    const r = dtRun([
+      {
+        kind: "task",
+        summary: "Talk about the client report",
+        final_status: "active",
+        owner: { status: "none", name: null, evidence: null },
+        deadline: { status: "none", wording: null, evidence: null, resolved_date: null, anchor_utterance_id: null },
+        events: [
+          { type: "proposed", utterance_id: "u3", quote: "We need to talk about the client report" },
+          { type: "accepted", utterance_id: "u5", quote: "Okay, let's pick this up next week" },
+        ],
+      },
+    ]);
+    expect(r.items).toHaveLength(0);
+    expect(r.dropped[0].reason).toContain("accepted");
+  });
+
+  it("rejects a deadline quoted from a postponement", () => {
+    const r = dtRun([
+      {
+        kind: "task",
+        summary: "Update the roadmap",
+        final_status: "active",
+        owner: { status: "none", name: null, evidence: null },
+        deadline: {
+          status: "agreed",
+          wording: "next week",
+          evidence: { utterance_id: "u5", quote: "let's pick this up next week" },
+          resolved_date: null,
+          anchor_utterance_id: null,
+        },
+        events: [{ type: "accepted", utterance_id: "u4", quote: "I'll update the roadmap" }],
+      },
+    ]);
+    expect(r.items[0].deadline).toMatchObject({ status: "none", wording: null });
+    expect(r.items[0].flags).toContain("deadline_unverified");
+  });
+});
+
+describe("verify: evidence names the subject", () => {
+  const st = makeTranscript([
+    [0, "Hi, I'm Anna, the project manager."], // u1
+    [1, "And I'm Mark, the developer."], // u2
+    [0, "About the customer survey, I was going to send it out."], // u3
+    [1, "Do we still need it?"], // u4
+    [0, "I'll send it out myself."], // u5
+  ]);
+  const stSpeakers: Extraction["speakers"] = [
+    { speaker: 0, name: "Anna", intro_utterance_id: "u1" },
+    { speaker: 1, name: "Mark", intro_utterance_id: "u2" },
+  ];
+  const surveyItem = (proposedQuote: string): ExtractedItem => ({
+    kind: "task",
+    summary: "Send the customer survey",
+    final_status: "active",
+    owner: { status: "agreed", name: "Anna", evidence: { utterance_id: "u5", quote: "I'll send it out myself" } },
+    deadline: { status: "none", wording: null, evidence: null, resolved_date: null, anchor_utterance_id: null },
+    events: [
+      { type: "proposed", utterance_id: "u3", quote: proposedQuote },
+      { type: "accepted", utterance_id: "u5", quote: "I'll send it out myself" },
+    ],
+  });
+  const stRun = (item: ExtractedItem) =>
+    verify(st, { speakers: stSpeakers, no_commitments_discussed: false, items: [item] });
+
+  it("flags an item whose quotes never name what it is about", () => {
+    const r = stRun(surveyItem("I was going to send it out"));
+    expect(r.items[0].flags).toContain("evidence_unspecific");
+  });
+
+  it("does not flag an item whose quote names the subject", () => {
+    const r = stRun(surveyItem("About the customer survey, I was going to send it out"));
+    expect(r.items[0].flags).not.toContain("evidence_unspecific");
+  });
+});

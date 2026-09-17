@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scoreCase, type Expected, type LineOffset } from "@/scripts/eval-lib";
+import { renderReport, scoreCase, type CaseScore, type Expected, type LineOffset, type RunResult } from "@/scripts/eval-lib";
 import type { Evidence, Report, VerifiedItem } from "@/lib/types";
 
 const offsets: LineOffset[] = [
@@ -88,5 +88,68 @@ describe("scoreCase", () => {
       ["clarification owner @ lines 3", true],
       ["clarification deadline @ lines 3", false],
     ]);
+  });
+});
+
+describe("renderReport", () => {
+  const usage = { audioSeconds: 60, llmModel: "openai/gpt-5-mini", llmResolvedModel: "openai/gpt-5-mini", llmCostSource: "gateway" } as RunResult["usage"];
+  const cost = { total: 0.014, perAudioMinute: 0.014 } as RunResult["cost"];
+  const score = {
+    statusMatch: true, status: "ok", expectedItems: 1, found: 1,
+    checks: [{ name: "c", pass: true, detail: "" }],
+    mustNotViolations: [], extraActive: [], extraOther: [], sttMisses: [],
+  } as CaseScore;
+  const results: RunResult[] = [
+    { case: "01-normal", run: 1, totalMs: 46900, stageMs: { extract: 40000 }, usage, cost, score },
+    { case: "01-normal", run: 2, totalMs: 1200, stageMs: {}, usage, cost, score: null, error: "Extraction failed after 2 attempts" },
+    { case: "01-normal", run: 3, totalMs: 70000, stageMs: { extract: 60000 }, usage, cost, score },
+  ];
+
+  it("times the runs that produced a result, not the ones that errored", () => {
+    const row = renderReport("20260918T000000Z", 3, ["01-normal"], results)
+      .split("\n")
+      .find((l) => l.startsWith("| 01-normal |"))!;
+    expect(row).toContain("58.5 s / 70.0 s");
+  });
+
+  it("counts errored runs in their own column", () => {
+    const md = renderReport("20260918T000000Z", 3, ["01-normal"], results);
+    const header = md.split("\n").find((l) => l.startsWith("| Case |"))!;
+    const row = md.split("\n").find((l) => l.startsWith("| 01-normal |"))!;
+    const at = header.split("|").findIndex((c) => c.trim() === "Errors");
+    expect(at).toBeGreaterThan(0);
+    expect(row.split("|")[at].trim()).toBe("1");
+  });
+});
+
+describe("scoreCase: must_not binding", () => {
+  const demo: VerifiedItem = {
+    ...docs,
+    summary: "Client demo",
+    owner: { status: "none", name: null, evidence: null },
+    deadline: { status: "none", wording: null, resolvedDate: null, evidence: null },
+    flags: [],
+    events: [ev("The client demo is on Friday then.", 5.5)],
+  };
+  // Mark's closing recap names both items in one utterance, so this item's quote also mentions the demo.
+  const recap: VerifiedItem = { ...docs, events: [ev("the docs from me by Wednesday, and the demo on Friday.", 6.5)] };
+  const demoExpected: Expected = {
+    status: "ok",
+    items: [{ anchor: ["client demo", "demo on Friday"], kind: "task", final_status: "active", owner: null }],
+    must_not: [{ anchor: ["client demo", "demo on Friday"], has_owner: true }],
+    clarifications: [],
+  };
+
+  it("checks an anchored must_not against the item bound to that anchor", () => {
+    const s = scoreCase(demoExpected, report([demo, recap]), null, offsets);
+    expect(s.found).toBe(1);
+    expect(s.mustNotViolations).toEqual([]);
+  });
+
+  it("still reports a violation when the bound item breaks the rule", () => {
+    const owned: VerifiedItem = { ...demo, owner: { status: "agreed", name: "Mark", evidence: ev("Mark", 5.5, "owner") } };
+    const s = scoreCase(demoExpected, report([owned, recap]), null, offsets);
+    expect(s.mustNotViolations).toHaveLength(1);
+    expect(s.mustNotViolations[0]).toContain("Client demo");
   });
 });

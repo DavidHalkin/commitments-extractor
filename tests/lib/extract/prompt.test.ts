@@ -13,7 +13,21 @@ describe("renderTranscript", () => {
 
 describe("SYSTEM_PROMPT", () => {
   it("states the non-negotiable rules", () => {
-    for (const phrase of ["we could", "cancelled", "null", "verbatim", "accepted", "assigned", "disputed"]) {
+    const phrases = [
+      "we could",
+      "cancelled",
+      "null",
+      "verbatim",
+      "accepted",
+      "assigned",
+      "disputed",
+      "name the subject",
+      "postpones the decision",
+      "separate open_question",
+      "Declining a proposal",
+      "no named owner",
+    ];
+    for (const phrase of phrases) {
       expect(SYSTEM_PROMPT).toContain(phrase);
     }
   });

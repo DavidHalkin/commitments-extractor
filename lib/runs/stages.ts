@@ -1,5 +1,6 @@
 import { computeCost } from "@/lib/metrics";
 import { addAttempts, declinedReport, runExtract, runTranscribe, StageError, type OnEvent } from "@/lib/pipeline";
+import { chargeInvocation, startMeter, type Meter } from "@/lib/runs/meter";
 import { addEvent, type Runs } from "@/lib/runs/runs";
 import type { Metrics, Report, Run, Transcript } from "@/lib/types";
 
@@ -13,17 +14,16 @@ function isStaleInFlight(stageStartedAt: string | null): boolean {
   return Date.now() - Date.parse(stageStartedAt) >= STALE_STAGE_MS;
 }
 
-function accountRequest(run: Run, startedAt: number) {
-  run.usage.cloudRunRequests += 1;
-  run.usage.cloudRunSeconds += (Date.now() - startedAt) / 1000;
+function accountRequest(run: Run, meter: Meter) {
+  chargeInvocation(run.usage, meter);
   // So a failed run still shows the cost already incurred, not just successful ones.
   run.cost = computeCost(run.usage);
 }
 
 /** Final accounting. `pendingWrites` are the uncounted report.json/run.json writes that follow. */
-function finalizeRun(run: Run, startedAt: number, pendingWrites: number): Metrics {
-  accountRequest(run, startedAt);
-  run.usage.gcsClassA += pendingWrites;
+function finalizeRun(run: Run, meter: Meter, pendingWrites: number): Metrics {
+  accountRequest(run, meter);
+  run.usage.blobAdvancedOps += pendingWrites;
   run.timeToResultMs = Date.now() - Date.parse(run.createdAt);
   run.cost = computeCost(run.usage);
   return { stageMs: run.stageMs, timeToResultMs: run.timeToResultMs, usage: run.usage, cost: run.cost };
@@ -39,7 +39,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     allowed = true;
   }
   if (!allowed) return run;
-  const startedAt = Date.now();
+  const meter = startMeter();
 
   let bytes: Uint8Array | null;
   try {
@@ -49,7 +49,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     run.status = "failed";
     run.failedStage = "upload";
     run.stageStartedAt = null;
-    accountRequest(run, startedAt);
+    accountRequest(run, meter);
     await runs.save(run);
     return run;
   }
@@ -58,14 +58,16 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     run.status = "failed";
     run.failedStage = "upload";
     run.stageStartedAt = null;
-    accountRequest(run, startedAt);
+    accountRequest(run, meter);
     await runs.save(run);
     return run;
   }
   if (!run.events.some((e) => e.stage === "upload" && e.type === "finished")) {
-    run.usage.gcsClassA += 1; // the browser's PUT
+    run.usage.blobAdvancedOps += 1; // the browser's presigned PUT
     run.usage.storedBytes += bytes.byteLength;
-    run.usage.egressBytes += bytes.byteLength; // assumption: the recording is played back once
+    // Downloaded twice: read above for transcription, and one assumed playback of the recording.
+    run.usage.blobTransferBytes += 2 * bytes.byteLength;
+    run.usage.blobSimpleOps += 1; // the assumed playback's presigned GET
     addEvent(run, "upload", "finished", `Received ${bytes.byteLength} bytes`);
   }
 
@@ -97,7 +99,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     run.status = "failed";
     run.failedStage = stage;
     run.stageStartedAt = null;
-    accountRequest(run, startedAt);
+    accountRequest(run, meter);
     await runs.save(run);
     return run;
   }
@@ -106,7 +108,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     run.status = "rejected";
     run.rejection = { code: outcome.check.code, message: outcome.check.message };
     run.stageStartedAt = null;
-    finalizeRun(run, startedAt, 1);
+    finalizeRun(run, meter, 1);
     await runs.save(run, { counted: false });
     return run;
   }
@@ -115,7 +117,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
     run.status = "done";
     run.reportStatus = "declined";
     run.stageStartedAt = null;
-    const metrics = finalizeRun(run, startedAt, 2);
+    const metrics = finalizeRun(run, meter, 2);
     await runs.putJson(run, "report.json", { ...declinedReport(outcome.reasons), metrics }, { counted: false });
     await runs.save(run, { counted: false });
     return run;
@@ -123,7 +125,7 @@ export async function stageTranscribe(runs: Runs, run: Run): Promise<Run> {
 
   run.status = "transcribed";
   run.stageStartedAt = null;
-  accountRequest(run, startedAt);
+  accountRequest(run, meter);
   await runs.save(run);
   return run;
 }
@@ -137,10 +139,10 @@ export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; re
     allowed = true;
   }
   if (!allowed) throw new ConflictError(`Run is "${run.status}"; extraction needs a transcribed run`);
-  const startedAt = Date.now();
+  const meter = startMeter();
 
   const transcript = await runs.getJson<Transcript>(run.id, "transcript.json");
-  run.usage.gcsClassB += 1;
+  run.usage.blobSimpleOps += 1;
   if (!transcript) throw new ConflictError("Transcript not found for this run");
 
   run.status = "extracting";
@@ -173,7 +175,7 @@ export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; re
     run.status = "failed";
     run.failedStage = stage;
     run.stageStartedAt = null;
-    accountRequest(run, startedAt);
+    accountRequest(run, meter);
     await runs.save(run);
     return { run, report: null };
   }
@@ -181,7 +183,7 @@ export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; re
   run.status = "done";
   run.reportStatus = out.report.status;
   run.stageStartedAt = null;
-  const metrics = finalizeRun(run, startedAt, 2);
+  const metrics = finalizeRun(run, meter, 2);
   const report: Report = { ...out.report, metrics };
   await runs.putJson(run, "report.json", report, { counted: false });
   await runs.save(run, { counted: false });

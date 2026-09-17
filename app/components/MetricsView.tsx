@@ -45,9 +45,9 @@ export function MetricsView({ metrics }: { metrics: MetricsLike }) {
                 <tr className="kv-group-start"><th scope="row">Recognition</th><td className="num">{formatUsd(cost.recognition)}</td><td /></tr>
                 <tr><th scope="row">Reasoning</th><td className="num">{formatUsd(cost.reasoning)}</td><td className="muted">{COST_SOURCE_NOTE[usage.llmCostSource]}</td></tr>
                 <tr><th scope="row">Speech output</th><td className="num">{formatUsd(cost.speech)}</td><td className="muted">the product does not synthesize speech</td></tr>
-                <tr><th scope="row">Storage 30 days and operations</th><td className="num">{formatUsd(cost.storage + cost.storageOps)}</td><td /></tr>
-                <tr><th scope="row">Egress</th><td className="num">{formatUsd(cost.egress)}</td><td className="muted">one playback</td></tr>
-                <tr><th scope="row">Cloud Run compute</th><td className="num">{formatUsd(cost.compute)}</td><td /></tr>
+                <tr><th scope="row">Blob storage 30 days and operations</th><td className="num">{formatUsd(cost.storage + cost.storageOps)}</td><td /></tr>
+                <tr><th scope="row">Blob transfer</th><td className="num">{formatUsd(cost.egress)}</td><td className="muted">read for transcription and one playback</td></tr>
+                <tr><th scope="row">Vercel compute</th><td className="num">{formatUsd(cost.compute)}</td><td className="muted">{usage.fnInvocations} invocations, {usage.fnCpuSeconds.toFixed(2)} s CPU, {usage.fnWallSeconds.toFixed(1)} s wall</td></tr>
                 <tr className="kv-total"><th scope="row">Total per operation</th><td className="num">{formatUsd(cost.total)}</td><td /></tr>
                 <tr className="kv-total"><th scope="row">Per audio minute</th><td className="num">{formatUsd(cost.perAudioMinute)}</td><td /></tr>
               </>

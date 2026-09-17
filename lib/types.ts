@@ -93,15 +93,20 @@ export type Usage = {
   llmCostUsd: number;
   /** Least reliable source across all attempts. */
   llmCostSource: LlmCostSource;
-  gcsClassA: number;
-  gcsClassB: number;
+  /** Blob put and list calls, including the browser's presigned PUT. */
+  blobAdvancedOps: number;
+  /** Blob reads, including the assumed playback's presigned GET. */
+  blobSimpleOps: number;
   storedBytes: number;
   retentionDays: number;
-  egressBytes: number;
-  cloudRunRequests: number;
-  cloudRunSeconds: number;
-  vcpu: number;
-  memoryGib: number;
+  /** Bytes downloaded from Blob: the audio read for transcription plus one assumed playback. */
+  blobTransferBytes: number;
+  fnInvocations: number;
+  /** Request durations; drive provisioned memory. */
+  fnWallSeconds: number;
+  /** Process CPU time during requests; drives Active CPU. */
+  fnCpuSeconds: number;
+  fnMemoryGb: number;
 };
 
 export type CostBreakdown = {

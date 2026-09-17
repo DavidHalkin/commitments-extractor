@@ -1,5 +1,6 @@
 import { LIMITS } from "@/lib/limits";
 import { emptyUsage } from "@/lib/metrics";
+import { chargeInvocation, startMeter } from "@/lib/runs/meter";
 import { getStore } from "@/lib/store";
 import type { ObjectStore } from "@/lib/store/store";
 import type { Run, RunEvent, Stage, UploadTarget } from "@/lib/types";
@@ -36,7 +37,7 @@ export class Runs {
   }
 
   async create(file: { name: string; sizeBytes: number; declaredType: string }, model: string): Promise<{ run: Run; upload: UploadTarget }> {
-    const t0 = Date.now();
+    const meter = startMeter();
     const run: Run = {
       id: newRunId(),
       createdAt: new Date().toISOString(),
@@ -54,8 +55,7 @@ export class Runs {
     };
     addEvent(run, "upload", "started", `Upload URL issued for ${file.name} (${file.sizeBytes} bytes)`);
     const upload = await this.store.uploadTarget(this.audioKey(run.id), "application/octet-stream", LIMITS.maxBytes);
-    run.usage.cloudRunRequests += 1;
-    run.usage.cloudRunSeconds += (Date.now() - t0) / 1000;
+    chargeInvocation(run.usage, meter);
     await this.save(run);
     return { run, upload };
   }
@@ -65,19 +65,19 @@ export class Runs {
     const bytes = await this.store.get(`runs/${id}/run.json`);
     if (!bytes) return null;
     const run = decode(bytes) as Run;
-    run.usage.gcsClassB += 1;
+    run.usage.blobSimpleOps += 1;
     return run;
   }
 
   async save(run: Run, opts: WriteOpts = {}): Promise<void> {
-    if (opts.counted !== false) run.usage.gcsClassA += 1;
+    if (opts.counted !== false) run.usage.blobAdvancedOps += 1;
     await this.store.put(`runs/${run.id}/run.json`, JSON.stringify(run, null, 2), "application/json");
   }
 
   async putJson(run: Run, name: JsonName, value: unknown, opts: WriteOpts = {}): Promise<void> {
     const body = JSON.stringify(value);
     if (opts.counted !== false) {
-      run.usage.gcsClassA += 1;
+      run.usage.blobAdvancedOps += 1;
       run.usage.storedBytes += Buffer.byteLength(body);
     }
     await this.store.put(`runs/${run.id}/${name}`, body, "application/json");
@@ -90,7 +90,7 @@ export class Runs {
   }
 
   async getAudio(run: Run): Promise<Uint8Array | null> {
-    run.usage.gcsClassB += 1;
+    run.usage.blobSimpleOps += 1;
     return this.store.get(this.audioKey(run.id));
   }
 

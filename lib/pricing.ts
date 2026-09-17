@@ -1,6 +1,6 @@
 /** List prices used for per-operation cost estimates. Free tiers and credits are ignored on purpose. */
 export const PRICING = {
-  checkedAt: "2026-09-16",
+  checkedAt: "2026-09-17",
   deepgram: {
     nova3PerMinute: 0.0043,
     aura2Per1kChars: 0.03,
@@ -15,19 +15,26 @@ export const PRICING = {
     source: "https://vercel.com/ai-gateway/models",
     note: "Used only when AI Gateway reports no cost for a generation. AI Gateway adds no markup to provider list prices.",
   },
-  cloudRun: {
-    vcpuSecond: 0.000024,
-    gibSecond: 0.0000025,
-    perMillionRequests: 0.4,
-    source: "https://cloud.google.com/run/pricing",
-    note: "europe-west1 (Tier 1), request-based billing.",
+  vercelFunctions: {
+    activeCpuPerHour: 0.128,
+    memoryGbHour: 0.0106,
+    invocationsPerMillion: 0.6,
+    memoryGb: 2,
+    source: "https://vercel.com/docs/functions/usage-and-pricing",
+    note: "Fluid compute in iad1, default 2 GB / 1 vCPU. Active CPU is not billed while waiting on I/O; provisioned memory is.",
   },
-  gcs: {
-    standardGbMonth: 0.02,
-    classAPer1000: 0.005,
-    classBPer1000: 0.0004,
-    egressPerGb: 0.12,
-    source: "https://cloud.google.com/storage/pricing",
-    note: "Standard storage, europe-west1 regional bucket, premium tier internet egress.",
+  vercelBlob: {
+    storageGbMonth: 0.023,
+    simpleOpsPerMillion: 0.4,
+    advancedOpsPerMillion: 5,
+    dataTransferPerGb: 0.05,
+    source: "https://vercel.com/docs/pricing/regional-pricing/iad1",
+    note: "Private store in iad1. put and list are advanced operations, reads are simple operations, del is free.",
+  },
+  vercelCdn: {
+    edgeRequestsPerMillion: 2,
+    fastOriginTransferPerGb: 0.06,
+    source: "https://vercel.com/docs/pricing/regional-pricing/iad1",
+    note: "Every blob read is an edge request; uncached reads also pay Fast Origin Transfer.",
   },
 } as const;

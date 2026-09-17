@@ -29,7 +29,8 @@ describe("Runs", () => {
     const loaded = await runs.get(run.id);
     expect(loaded?.status).toBe("created");
     expect(loaded?.events[0]).toMatchObject({ stage: "upload", type: "started" });
-    expect(loaded?.usage.gcsClassA).toBe(1);
+    expect(loaded?.usage.blobAdvancedOps).toBe(1);
+    expect(loaded?.usage.fnInvocations).toBe(1);
   });
 
   it("appends events and stores JSON documents", async () => {

@@ -11,30 +11,34 @@ export function emptyUsage(model: string): Usage {
     llmAttempts: 0,
     llmCostUsd: 0,
     llmCostSource: "gateway",
-    gcsClassA: 0,
-    gcsClassB: 0,
+    blobAdvancedOps: 0,
+    blobSimpleOps: 0,
     storedBytes: 0,
     retentionDays: 30,
-    egressBytes: 0,
-    cloudRunRequests: 0,
-    cloudRunSeconds: 0,
-    vcpu: 1,
-    memoryGib: 1,
+    blobTransferBytes: 0,
+    fnInvocations: 0,
+    fnWallSeconds: 0,
+    fnCpuSeconds: 0,
+    fnMemoryGb: PRICING.vercelFunctions.memoryGb,
   };
 }
 
-const GIB = 1024 ** 3;
+const GB = 1024 ** 3;
 
 export function computeCost(u: Usage, p: typeof PRICING = PRICING): CostBreakdown {
+  const { vercelFunctions: fn, vercelBlob: blob, vercelCdn: cdn } = p;
   const recognition = (u.audioSeconds / 60) * p.deepgram.nova3PerMinute;
   // Summed per attempt in lib/extract/llm.ts: Gateway-reported where available, list-price estimate otherwise.
   const reasoning = u.llmCostUsd;
-  const storage = (u.storedBytes / GIB) * p.gcs.standardGbMonth * (u.retentionDays / 30);
-  const storageOps = (u.gcsClassA * p.gcs.classAPer1000 + u.gcsClassB * p.gcs.classBPer1000) / 1000;
-  const egress = (u.egressBytes / GIB) * p.gcs.egressPerGb;
+  const storage = (u.storedBytes / GB) * blob.storageGbMonth * (u.retentionDays / 30);
+  const storageOps =
+    (u.blobAdvancedOps * blob.advancedOpsPerMillion + u.blobSimpleOps * (blob.simpleOpsPerMillion + cdn.edgeRequestsPerMillion)) / 1e6;
+  // Reads bypass or miss the CDN cache (useCache: false, first playback), so Fast Origin Transfer applies too.
+  const egress = (u.blobTransferBytes / GB) * (blob.dataTransferPerGb + cdn.fastOriginTransferPerGb);
   const compute =
-    u.cloudRunSeconds * (u.vcpu * p.cloudRun.vcpuSecond + u.memoryGib * p.cloudRun.gibSecond) +
-    (u.cloudRunRequests / 1e6) * p.cloudRun.perMillionRequests;
+    (u.fnCpuSeconds / 3600) * fn.activeCpuPerHour +
+    (u.fnWallSeconds / 3600) * u.fnMemoryGb * fn.memoryGbHour +
+    (u.fnInvocations / 1e6) * fn.invocationsPerMillion;
   const total = recognition + reasoning + storage + storageOps + egress + compute;
   const minutes = u.audioSeconds / 60;
   return {

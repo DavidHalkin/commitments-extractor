@@ -108,7 +108,7 @@ function addAttempts(usage: Usage, attempts: LlmAttempt[]) {
 
 /** Eval path: same processing as the app, no storage; usage covers API calls only. */
 export async function processAudio(bytes: Uint8Array): Promise<{ report: Report; transcript: Transcript | null; stageMs: StageMs; usage: Usage }> {
-  const usage: Usage = { ...emptyUsage(EXTRACT_MODEL), retentionDays: 0, vcpu: 0, memoryGib: 0 };
+  const usage: Usage = { ...emptyUsage(EXTRACT_MODEL), retentionDays: 0, fnMemoryGb: 0 };
   const tr = await runTranscribe(bytes);
   if (tr.kind === "rejected") return { report: declinedReport([tr.check.message]), transcript: null, stageMs: tr.ms, usage };
   usage.audioSeconds = tr.transcript.durationSec;

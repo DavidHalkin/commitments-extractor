@@ -25,26 +25,36 @@ const created = await json<{ runId: string; upload: { url: string; method: strin
     body: JSON.stringify({ fileName: "smoke.mp3", sizeBytes: audio.byteLength, declaredType: "audio/mpeg" }),
   }),
 );
-check(created.upload.url.startsWith("https://"), `upload URL is not a presigned Blob URL: ${created.upload.url}`);
 
-const put = await fetch(created.upload.url, { method: created.upload.method, headers: created.upload.headers, body: audio });
-check(put.ok, `presigned PUT returned ${put.status}: ${await put.text()}`);
+let cleaned = false;
+try {
+  check(created.upload.url.startsWith("https://"), `upload URL is not a presigned Blob URL: ${created.upload.url}`);
 
-const audioRoute = await fetch(`${base}/api/runs/${created.runId}/audio`, { redirect: "manual" });
-check(audioRoute.status === 302, `audio route returned ${audioRoute.status}, expected a 302 to a presigned GET`);
-const played = await fetch(audioRoute.headers.get("location")!);
-check(played.ok, `presigned GET returned ${played.status}`);
-check((await played.arrayBuffer()).byteLength === audio.byteLength, "downloaded audio size differs from the upload");
+  const put = await fetch(created.upload.url, { method: created.upload.method, headers: created.upload.headers, body: audio });
+  check(put.ok, `presigned PUT returned ${put.status}: ${await put.text()}`);
 
-const history = await json<{ runs: { id: string }[] }>(await fetch(`${base}/api/runs`));
-check(history.runs.some((r) => r.id === created.runId), "new run is missing from history");
+  const audioRoute = await fetch(`${base}/api/runs/${created.runId}/audio`, { redirect: "manual" });
+  check(audioRoute.status === 302, `audio route returned ${audioRoute.status}, expected a 302 to a presigned GET`);
+  const played = await fetch(audioRoute.headers.get("location")!);
+  check(played.ok, `presigned GET returned ${played.status}`);
+  check((await played.arrayBuffer()).byteLength === audio.byteLength, "downloaded audio size differs from the upload");
 
-const cron = await fetch(`${base}/api/cron/cleanup`);
-check(cron.status === 401, `cron route without the secret returned ${cron.status}, expected 401`);
+  const history = await json<{ runs: { id: string }[] }>(await fetch(`${base}/api/runs`));
+  check(history.runs.some((r) => r.id === created.runId), "new run is missing from history");
 
-const deleted = await json<{ ok: boolean }>(await fetch(`${base}/api/runs/${created.runId}`, { method: "DELETE" }));
-check(deleted.ok, "delete did not report ok");
-const gone = await fetch(`${base}/api/runs/${created.runId}`);
-check(gone.status === 404, `deleted run still returns ${gone.status}`);
+  const cron = await fetch(`${base}/api/cron/cleanup`);
+  check(cron.status === 401, `cron route without the secret returned ${cron.status}, expected 401`);
+
+  const deleted = await json<{ ok: boolean }>(await fetch(`${base}/api/runs/${created.runId}`, { method: "DELETE" }));
+  check(deleted.ok, "delete did not report ok");
+  const gone = await fetch(`${base}/api/runs/${created.runId}`);
+  check(gone.status === 404, `deleted run still returns ${gone.status}`);
+
+  cleaned = true;
+} finally {
+  if (!cleaned) {
+    await fetch(`${base}/api/runs/${created.runId}`, { method: "DELETE" }).catch(() => undefined);
+  }
+}
 
 console.log(`Smoke test passed for ${base}`);

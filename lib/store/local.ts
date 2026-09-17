@@ -14,7 +14,7 @@ export class LocalStore implements ObjectStore {
     return path.join(this.root, ...key.replace(/\/$/, "").split("/"));
   }
 
-  // contentType is part of the ObjectStore interface (GcsStore needs it); the filesystem doesn't.
+  // contentType is part of the ObjectStore interface (BlobStore needs it); the filesystem doesn't.
   async put(key: string, data: Uint8Array | string, contentType?: string): Promise<void> {
     void contentType;
     await fs.mkdir(path.dirname(this.file(key)), { recursive: true });

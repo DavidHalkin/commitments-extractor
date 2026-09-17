@@ -14,7 +14,7 @@
     "eval": "tsx --env-file=.env.local scripts/eval.mts"
   },
   "dependencies": {
-    "@google-cloud/storage": "^8.1.0",
+    "@vercel/blob": "^2.8.0",
     "ai": "^7.0.105",
     "file-type": "^22.1.0",
     "music-metadata": "^11.15.0",

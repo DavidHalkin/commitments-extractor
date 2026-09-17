@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (process.env.STORE_DRIVER === "gcs") return NextResponse.json({ error: "Not available" }, { status: 404 });
+  if (process.env.STORE_DRIVER === "blob") return NextResponse.json({ error: "Not available" }, { status: 404 });
   const { id } = await params;
   const runs = new Runs();
   if (!(await runs.get(id))) return NextResponse.json({ error: "Run not found" }, { status: 404 });

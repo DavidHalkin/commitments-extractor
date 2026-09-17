@@ -1,0 +1,13 @@
+
+> commitments-extractor@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.50.187:3000
+- Environments: .env.local
+✓ Ready in 462ms
+✓ Running next.config.ts took 40ms
+
+ GET /api/health 200 in 250ms (next.js: 224ms, application-code: 26ms)
+ GET /api/cron/cleanup 401 in 211ms (next.js: 160ms, application-code: 51ms)

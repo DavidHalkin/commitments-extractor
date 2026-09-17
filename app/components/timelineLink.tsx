@@ -9,6 +9,7 @@ type TimelineLink = {
   setActiveKey: (key: string | null) => void;
   /** The last evidence moment picked on the timeline; rows that contain it open themselves. */
   openRequest: OpenRequest | null;
+  /** Opens the enclosing collapsed group(s) for a moment's rows, then scrolls the first row into view once it has expanded. */
   openEvidence: (key: string) => void;
 };
 
@@ -25,9 +26,15 @@ export function TimelineLinkProvider({ children }: { children: ReactNode }) {
   const [openRequest, setOpenRequest] = useState<OpenRequest | null>(null);
   const openEvidence = useCallback((key: string) => {
     setOpenRequest((prev) => ({ key, nonce: (prev?.nonce ?? 0) + 1 }));
-    const row = document.querySelector(`[data-evidence-keys~="${CSS.escape(key)}"]`);
+    const rows = document.querySelectorAll(`[data-evidence-keys~="${CSS.escape(key)}"]`);
+    for (const row of rows) {
+      const details = row.closest("details");
+      if (details && !details.open) details.open = true;
+    }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    row?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    requestAnimationFrame(() => {
+      rows[0]?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    });
   }, []);
   const value = useMemo(() => ({ activeKey, setActiveKey, openRequest, openEvidence }), [activeKey, openRequest, openEvidence]);
   return <TimelineLinkContext.Provider value={value}>{children}</TimelineLinkContext.Provider>;

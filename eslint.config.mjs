@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Git-ignored state directory of the gstack browser tool; eslint crashes with EPERM reading it.
+    ".gstack/**",
   ]),
 ]);
 

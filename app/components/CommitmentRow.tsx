@@ -35,8 +35,8 @@ const ABOUT_LABEL: Record<Clarification["about"], string> = {
   question: "Open question",
 };
 
-export function Chip({ tone, children }: { tone?: RowTone | "accent"; children: ReactNode }) {
-  return <span className={`chip${tone ? ` chip-${tone}` : ""}`}>{children}</span>;
+export function Chip({ tone, title, children }: { tone?: RowTone | "accent"; title?: string; children: ReactNode }) {
+  return <span className={`chip${tone ? ` chip-${tone}` : ""}`} title={title}>{children}</span>;
 }
 
 /** A collapsible list row: status icon, title and chips; the body holds quotes and warnings. */
@@ -82,8 +82,16 @@ export function ItemRow({ item, tone, onPlay }: { item: VerifiedItem; tone: RowT
   const chips = (
     <>
       {STATUS_CHIP[item.finalStatus] ? <Chip tone="setaside">{STATUS_CHIP[item.finalStatus]}</Chip> : null}
-      {fields ? <Chip tone={item.owner.name ? "accent" : "unsettled"}>{item.owner.name ?? "No owner"}</Chip> : null}
-      {fields ? <Chip tone={item.deadline.wording ? "accent" : "unsettled"}>{item.deadline.wording ?? "No deadline"}</Chip> : null}
+      {fields ? (
+        <Chip tone={item.owner.name ? "accent" : "unsettled"} title={item.owner.name ?? "No owner"}>
+          <span className="sr-only">Owner: </span>{item.owner.name ?? "No owner"}
+        </Chip>
+      ) : null}
+      {fields ? (
+        <Chip tone={item.deadline.wording ? "accent" : "unsettled"} title={item.deadline.wording ?? "No deadline"}>
+          <span className="sr-only">Deadline: </span>{item.deadline.wording ?? "No deadline"}
+        </Chip>
+      ) : null}
     </>
   );
   return (

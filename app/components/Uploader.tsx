@@ -71,8 +71,10 @@ export function Uploader() {
   }, [file, objectUrl]);
 
   const patchStep = (s: StepName, patch: Partial<StepState>) => setSteps((prev) => ({ ...prev, [s]: { ...prev[s], ...patch } }));
-  const failStep = (s: StepName, ms: number) =>
-    setSteps((prev) => ({ ...prev, [s]: { ...prev[s], status: "failed", ms, frozenPercent: progressPercent(prev, performance.now()) } }));
+  const failStep = (s: StepName, ms: number) => {
+    const at = performance.now();
+    setSteps((prev) => ({ ...prev, [s]: { ...prev[s], status: "failed", ms, frozenPercent: progressPercent(prev, at) } }));
+  };
 
   async function process(from: RequestStep) {
     if (!file) return;
@@ -105,7 +107,13 @@ export function Uploader() {
           if (run.status === "failed") throw new Error(lastFailure(run));
           if (run.status === "rejected") {
             failStep("transcribe", performance.now() - t0);
-            setDetail(await api<RunDetail>(`/api/runs/${id}`));
+            try {
+              const d = await api<RunDetail>(`/api/runs/${id}`);
+              setDetail(d);
+              setError(d.run.rejection?.message ?? "File rejected");
+            } catch {
+              setError("The result is ready but could not be loaded. Open it from History.");
+            }
             setBusy(false);
             return;
           }
@@ -114,7 +122,11 @@ export function Uploader() {
             // Declined before extraction: nothing left to run.
             patchStep("extract", { status: "done" });
             patchStep("verify", { status: "done" });
-            setDetail(await api<RunDetail>(`/api/runs/${id}`));
+            try {
+              setDetail(await api<RunDetail>(`/api/runs/${id}`));
+            } catch {
+              setError("The result is ready but could not be loaded. Open it from History.");
+            }
             setBusy(false);
             return;
           }
@@ -123,7 +135,11 @@ export function Uploader() {
           if (!report) throw new Error(lastFailure(run));
           patchStep("extract", { status: "done", ms: run.stageMs.extract ?? performance.now() - t0 });
           patchStep("verify", { status: "done", ms: run.stageMs.verify });
-          setDetail(await api<RunDetail>(`/api/runs/${id}`));
+          try {
+            setDetail(await api<RunDetail>(`/api/runs/${id}`));
+          } catch {
+            setError("The result is ready but could not be loaded. Open it from History.");
+          }
         }
       } catch (e) {
         failStep(s, performance.now() - t0);
@@ -156,7 +172,7 @@ export function Uploader() {
         waveform={waveform}
         markers={markers}
         onPlay={playSegment}
-        onDropFile={choose}
+        onDropFile={busy ? undefined : choose}
         prompt={usable ? undefined : (
           <>
             <p className="timeline-prompt-text">Drop a recording here</p>

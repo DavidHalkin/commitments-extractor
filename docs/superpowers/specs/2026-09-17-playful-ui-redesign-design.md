@@ -81,8 +81,8 @@ Sticky header on `--bg` with a 2px `--line` bottom border: brand "Commitments" (
 
 ### 4c. Home — processing (`ProgressMeter`, replaces `StageSequence`)
 
-Card with, top to bottom: percentage (Fredoka 48px), step name (22px), "Step N of 4 · 23 s",
-the bar (22px tall, ink border, accent fill), a one-line explanation, and a row of the four step
+Card with, top to bottom: percentage (Fredoka 56px, 44px on phones), step name (22px), "Step N of 4 · 23 s",
+the bar (24px tall, ink border, accent fill), a one-line explanation, and a row of the four step
 names with ✓ for finished ones and their durations.
 
 | # | Step name | Explanation line |
@@ -108,9 +108,10 @@ their text.
 ### 4f. Run page (`app/history/[id]/page.tsx`)
 
 Header card: file name, status chip, then small facts (uploaded, duration, size, declared type,
-detected format). Then the timeline, rejection card if any, the report (§6), and collapsed sections
-"Transcript", "What happened" (`EventLog`), "Speed and cost", "Raw API responses". Delete button
-(secondary style with set-aside border) at the bottom with the existing confirm dialog.
+detected format). Then the timeline, rejection card if any, the report (§6), then one collapsed
+**Details** card containing "Transcript", "What happened" (`EventLog`), "Speed and cost" and "Raw
+API responses". Delete button (secondary style with set-aside border) below, with the existing
+confirm dialog.
 
 ## 5. Progress model
 
@@ -182,7 +183,9 @@ matching today's handling.
   missing owners/deadlines; not commitments = cancelled + not accepted + dropped by the verifier).
   Computed by a pure `summaryCounts(report)` in `app/components/reportModel.ts`.
 - **Groups**, in order: "Agreed" (active tasks), "Needs clarification" (`report.clarifications`),
-  "Not commitments" (cancelled, not accepted, dropped — the group is collapsed by default).
+  "Not commitments" (cancelled, not accepted, dropped — the group is collapsed by default). Items
+  of kind `open_question` appear through their clarification; cancelled or not-accepted open
+  questions are not listed (same as the timeline markers).
 - **Row, collapsed**: status icon (✓ agreed / ? unsettled / ✕ set aside) with a visually hidden text
   label, summary, owner chip ("Mark" or "No owner" in unsettled fill), deadline chip (the wording,
   e.g. "by Wednesday", or "No deadline"), chevron. The whole row header is a `<button>` with

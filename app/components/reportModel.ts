@@ -19,12 +19,24 @@ export function tasksBy(report: Report, status: VerifiedItem["finalStatus"]): Ve
   return report.items.filter((i) => i.kind === "task" && i.finalStatus === status);
 }
 
+export type SummaryCounts = { agreed: number; toClarify: number; notCommitments: number };
+
+/** Header counts: active tasks, clarifications (which already include open questions), and everything set aside. */
+export function summaryCounts(report: Report): SummaryCounts {
+  return {
+    agreed: report.status === "ok" ? tasksBy(report, "active").length : 0,
+    toClarify: report.clarifications.length,
+    notCommitments: tasksBy(report, "cancelled").length + tasksBy(report, "not_accepted").length + report.dropped.length,
+  };
+}
+
 /** Owner and deadline fields are shown for active items, and for others only when a field is disputed. */
 export function showFields(item: VerifiedItem): boolean {
   return item.finalStatus === "active" || item.owner.status === "disputed" || item.deadline.status === "disputed";
 }
 
-function displayedEvidence(item: VerifiedItem): Evidence[] {
+/** Evidence shown for an item: owner and deadline quotes when its fields are shown, then its event timeline. */
+export function itemEvidence(item: VerifiedItem): Evidence[] {
   const fields = showFields(item) ? [item.owner.evidence, item.deadline.evidence] : [];
   return [...fields, ...item.events].filter((ev): ev is Evidence => ev != null);
 }
@@ -43,10 +55,10 @@ export function buildMarkers(report: Report | null | undefined): TimelineMarker[
   };
   for (const c of report.clarifications) add(c.evidence, "unsettled", c.question);
   if (report.status === "ok") {
-    for (const item of tasksBy(report, "active")) displayedEvidence(item).forEach((ev) => add(ev, "agreed", item.summary));
+    for (const item of tasksBy(report, "active")) itemEvidence(item).forEach((ev) => add(ev, "agreed", item.summary));
   }
   for (const item of [...tasksBy(report, "cancelled"), ...tasksBy(report, "not_accepted")]) {
-    displayedEvidence(item).forEach((ev) => add(ev, "setaside", item.summary));
+    itemEvidence(item).forEach((ev) => add(ev, "setaside", item.summary));
   }
   return [...byKey.values()].sort((a, b) => a.start - b.start);
 }

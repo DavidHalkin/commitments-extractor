@@ -19,7 +19,7 @@ export const TimelineMarkerLayer = memo(function TimelineMarkerLayer({
   domainSec: number;
   onPlay: OnPlay;
 }) {
-  const { activeKey, setActiveKey } = useTimelineLink();
+  const { activeKey, setActiveKey, openEvidence } = useTimelineLink();
   const last = Math.max(1, markers.length - 1);
   return (
     <>
@@ -33,7 +33,10 @@ export const TimelineMarkerLayer = memo(function TimelineMarkerLayer({
             style={{ left: `${Math.min(100, (m.start / domainSec) * 100)}%`, animationDelay: `${Math.round((i / last) * STAGGER_MS)}ms` }}
             aria-label={label}
             title={label}
-            onClick={() => onPlay(m.start, m.end)}
+            onClick={() => {
+              onPlay(m.start, m.end);
+              openEvidence(m.key);
+            }}
             onMouseEnter={() => setActiveKey(m.key)}
             onMouseLeave={() => setActiveKey(null)}
             onFocus={() => setActiveKey(m.key)}

@@ -6,11 +6,13 @@ import { LocalStore } from "@/lib/store/local";
 import { addEvent, newRunId, RUN_ID_RE, Runs } from "@/lib/runs/runs";
 
 let root: string;
+let store: LocalStore;
 let runs: Runs;
 
 beforeEach(() => {
   root = mkdtempSync(path.join(tmpdir(), "runs-"));
-  runs = new Runs(new LocalStore(root));
+  store = new LocalStore(root);
+  runs = new Runs(store);
 });
 afterEach(() => rmSync(root, { recursive: true, force: true }));
 
@@ -52,6 +54,53 @@ describe("Runs", () => {
     expect(await runs.delete(a.run.id)).toBe(true);
     expect(await runs.get(a.run.id)).toBeNull();
     expect((await runs.list()).map((r) => r.id)).toEqual([b.run.id]);
+  });
+
+  it("reads runs stored before the Vercel migration with their usage mapped to the current fields", async () => {
+    const id = "20260916T210344Z-z4ob5t";
+    const legacy = {
+      id,
+      createdAt: "2026-09-16T21:03:44.000Z",
+      file: { name: "old.mp3", sizeBytes: 2048, declaredType: "", detectedFormat: "mp3", mime: "audio/mpeg", durationSec: 38.3, hasVideo: false },
+      status: "failed",
+      failedStage: "extract",
+      stageStartedAt: null,
+      rejection: null,
+      reportStatus: null,
+      events: [],
+      stageMs: {},
+      usage: {
+        audioSeconds: 38.3, claudeModel: "claude-sonnet-5", claudeInputTokens: 1200, claudeOutputTokens: 300, claudeAttempts: 2,
+        gcsClassA: 9, gcsClassB: 4, storedBytes: 4096, retentionDays: 30, egressBytes: 2048,
+        cloudRunRequests: 3, cloudRunSeconds: 1.8, vcpu: 1, memoryGib: 1,
+      },
+      timeToResultMs: null,
+      cost: { recognition: 0.003, reasoning: 0.0054, speech: 0, storage: 0, storageOps: 0, egress: 0, compute: 0, total: 0.0084, perAudioMinute: 0.013 },
+    };
+    await store.put(`runs/${id}/run.json`, JSON.stringify(legacy), "application/json");
+
+    const loaded = await runs.get(id);
+    expect(loaded?.usage).toEqual({
+      audioSeconds: 38.3,
+      llmModel: "claude-sonnet-5",
+      llmResolvedModel: null,
+      llmInputTokens: 1200,
+      llmOutputTokens: 300,
+      llmAttempts: 2,
+      llmCostUsd: 0.0054,
+      llmCostSource: "estimated",
+      blobAdvancedOps: 9,
+      blobSimpleOps: 5,
+      storedBytes: 4096,
+      retentionDays: 30,
+      blobTransferBytes: 2048,
+      fnInvocations: 3,
+      fnWallSeconds: 1.8,
+      fnCpuSeconds: 0,
+      fnMemoryGb: 1,
+    });
+    expect(loaded?.cost?.total).toBe(0.0084);
+    expect((await runs.list())[0].usage.llmModel).toBe("claude-sonnet-5");
   });
 
   it("rejects ids that could escape the runs prefix", async () => {

@@ -29,6 +29,54 @@ type WriteOpts = { counted?: boolean };
 
 const decode = (b: Uint8Array) => JSON.parse(new TextDecoder().decode(b));
 
+type LegacyUsage = {
+  audioSeconds: number;
+  claudeModel: string;
+  claudeInputTokens: number;
+  claudeOutputTokens: number;
+  claudeAttempts: number;
+  gcsClassA: number;
+  gcsClassB: number;
+  storedBytes: number;
+  retentionDays: number;
+  egressBytes: number;
+  cloudRunRequests: number;
+  cloudRunSeconds: number;
+  memoryGib: number;
+};
+
+/**
+ * Runs stored before the Vercel/AI Gateway migration use Cloud Run/GCS/Claude usage fields.
+ * Map them to the current fields so history pages and retries keep working; their stored cost is left as computed then.
+ */
+function readRun(bytes: Uint8Array): Run {
+  const run = decode(bytes) as Run;
+  if (!("claudeModel" in run.usage)) return run;
+  const old = run.usage as unknown as LegacyUsage;
+  run.usage = {
+    audioSeconds: old.audioSeconds,
+    llmModel: old.claudeModel,
+    llmResolvedModel: null,
+    llmInputTokens: old.claudeInputTokens,
+    llmOutputTokens: old.claudeOutputTokens,
+    llmAttempts: old.claudeAttempts,
+    // The old pipeline priced tokens from its own list-price table.
+    llmCostUsd: run.cost?.reasoning ?? 0,
+    llmCostSource: "estimated",
+    blobAdvancedOps: old.gcsClassA,
+    blobSimpleOps: old.gcsClassB,
+    storedBytes: old.storedBytes,
+    retentionDays: old.retentionDays,
+    blobTransferBytes: old.egressBytes,
+    fnInvocations: old.cloudRunRequests,
+    fnWallSeconds: old.cloudRunSeconds,
+    // Not measured before the migration.
+    fnCpuSeconds: 0,
+    fnMemoryGb: old.memoryGib,
+  };
+  return run;
+}
+
 export class Runs {
   constructor(private store: ObjectStore = getStore()) {}
 
@@ -64,7 +112,7 @@ export class Runs {
     if (!RUN_ID_RE.test(id)) return null;
     const bytes = await this.store.get(`runs/${id}/run.json`);
     if (!bytes) return null;
-    const run = decode(bytes) as Run;
+    const run = readRun(bytes);
     run.usage.blobSimpleOps += 1;
     return run;
   }
@@ -101,7 +149,7 @@ export class Runs {
       .reverse()
       .slice(0, limit);
     const loaded = await Promise.all(ids.map((id) => this.store.get(`runs/${id}/run.json`)));
-    return loaded.filter((b): b is Uint8Array => b != null).map((b) => decode(b) as Run);
+    return loaded.filter((b): b is Uint8Array => b != null).map(readRun);
   }
 
   async delete(id: string): Promise<boolean> {

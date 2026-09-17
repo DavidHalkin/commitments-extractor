@@ -78,12 +78,21 @@ export type ReportStatus = "ok" | "needs_clarification" | "no_commitments" | "de
 
 export type Stage = "upload" | "file-check" | "transcribe" | "precheck" | "extract" | "verify";
 
+/** Where an LLM cost figure came from, from most to least reliable. */
+export type LlmCostSource = "gateway" | "estimated" | "unknown";
+
 export type Usage = {
   audioSeconds: number;
-  claudeModel: string;
-  claudeInputTokens: number;
-  claudeOutputTokens: number;
-  claudeAttempts: number;
+  /** Requested AI Gateway model id. */
+  llmModel: string;
+  /** Provider/model that served the successful attempt, as reported by AI Gateway. */
+  llmResolvedModel: string | null;
+  llmInputTokens: number;
+  llmOutputTokens: number;
+  llmAttempts: number;
+  llmCostUsd: number;
+  /** Least reliable source across all attempts. */
+  llmCostSource: LlmCostSource;
   gcsClassA: number;
   gcsClassB: number;
   storedBytes: number;

@@ -23,7 +23,7 @@ export function addEvent(run: Run, stage: Stage, type: RunEvent["type"], detail:
   });
 }
 
-export type JsonName = "transcript.json" | "report.json" | "raw/deepgram.json" | "raw/claude.json";
+export type JsonName = "transcript.json" | "report.json" | "raw/deepgram.json" | "raw/llm.json";
 type WriteOpts = { counted?: boolean };
 
 const decode = (b: Uint8Array) => JSON.parse(new TextDecoder().decode(b));

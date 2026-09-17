@@ -4,10 +4,13 @@ import type { CostBreakdown, Usage } from "@/lib/types";
 export function emptyUsage(model: string): Usage {
   return {
     audioSeconds: 0,
-    claudeModel: model,
-    claudeInputTokens: 0,
-    claudeOutputTokens: 0,
-    claudeAttempts: 0,
+    llmModel: model,
+    llmResolvedModel: null,
+    llmInputTokens: 0,
+    llmOutputTokens: 0,
+    llmAttempts: 0,
+    llmCostUsd: 0,
+    llmCostSource: "gateway",
     gcsClassA: 0,
     gcsClassB: 0,
     storedBytes: 0,
@@ -23,10 +26,9 @@ export function emptyUsage(model: string): Usage {
 const GIB = 1024 ** 3;
 
 export function computeCost(u: Usage, p: typeof PRICING = PRICING): CostBreakdown {
-  const model = p.anthropic.models[u.claudeModel];
-  if (!model) throw new Error(`No pricing for model ${u.claudeModel}`);
   const recognition = (u.audioSeconds / 60) * p.deepgram.nova3PerMinute;
-  const reasoning = (u.claudeInputTokens * model.inputPerMTok + u.claudeOutputTokens * model.outputPerMTok) / 1e6;
+  // Summed per attempt in lib/extract/llm.ts: Gateway-reported where available, list-price estimate otherwise.
+  const reasoning = u.llmCostUsd;
   const storage = (u.storedBytes / GIB) * p.gcs.standardGbMonth * (u.retentionDays / 30);
   const storageOps = (u.gcsClassA * p.gcs.classAPer1000 + u.gcsClassB * p.gcs.classBPer1000) / 1000;
   const egress = (u.egressBytes / GIB) * p.gcs.egressPerGb;

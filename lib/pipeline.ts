@@ -1,10 +1,9 @@
-import type Anthropic from "@anthropic-ai/sdk";
-import { EXTRACT_MODEL, ExtractionError, extractCommitments, type ClaudeAttempt } from "@/lib/extract/claude";
+import { EXTRACT_MODEL, ExtractionError, extractCommitments, type Generate, type LlmAttempt } from "@/lib/extract/llm";
 import { checkAudioFile, type FileCheckFail, type FileCheckOk } from "@/lib/gate/file-check";
 import { precheck } from "@/lib/gate/precheck";
 import { emptyUsage } from "@/lib/metrics";
 import { transcribeBytes, type DeepgramResponse } from "@/lib/stt/deepgram";
-import type { Report, RunEvent, Stage, Transcript, Usage } from "@/lib/types";
+import type { LlmCostSource, Report, RunEvent, Stage, Transcript, Usage } from "@/lib/types";
 import { verify } from "@/lib/verify/verify";
 
 export type StageMs = Partial<Record<Stage, number>>;
@@ -12,7 +11,7 @@ export type OnEvent = (stage: Stage, type: RunEvent["type"], detail: string, ms?
 const noop: OnEvent = () => {};
 
 export class StageError extends Error {
-  constructor(public stage: Stage, message: string, public attempts: ClaudeAttempt[] = []) {
+  constructor(public stage: Stage, message: string, public attempts: LlmAttempt[] = []) {
     super(message);
     this.name = "StageError";
   }
@@ -67,24 +66,25 @@ export async function runTranscribe(bytes: Uint8Array, onEvent: OnEvent = noop):
 export async function runExtract(
   transcript: Transcript,
   onEvent: OnEvent = noop,
-  client?: Anthropic,
-): Promise<{ report: Report; attempts: ClaudeAttempt[]; ms: StageMs }> {
+  generate?: Generate,
+): Promise<{ report: Report; attempts: LlmAttempt[]; ms: StageMs }> {
   const ms: StageMs = {};
   onEvent("extract", "started", `Model ${EXTRACT_MODEL}`);
   let t = performance.now();
   let result: Awaited<ReturnType<typeof extractCommitments>>;
   try {
-    result = await extractCommitments(transcript, client);
+    result = await extractCommitments(transcript, generate);
   } catch (e) {
     const attempts = e instanceof ExtractionError ? e.attempts : [];
-    attempts.forEach((a, i) => onEvent("extract", "retry", `Attempt ${i + 1} failed: ${a.error ?? a.stopReason}`));
+    attempts.forEach((a, i) => onEvent("extract", "retry", `Attempt ${i + 1} failed: ${a.error ?? a.finishReason}`));
     throw new StageError("extract", errMsg(e), attempts);
   }
   result.attempts
     .filter((a) => !a.ok)
-    .forEach((a, i) => onEvent("extract", "retry", `Attempt ${i + 1} failed: ${a.error ?? a.stopReason}`));
+    .forEach((a, i) => onEvent("extract", "retry", `Attempt ${i + 1} failed: ${a.error ?? a.finishReason}`));
   ms.extract = performance.now() - t;
-  onEvent("extract", "finished", `${result.extraction.items.length} items proposed by the model`, ms.extract);
+  const served = result.attempts[result.attempts.length - 1].model;
+  onEvent("extract", "finished", `${result.extraction.items.length} items proposed by ${served}`, ms.extract);
 
   t = performance.now();
   const report = verify(transcript, result.extraction);
@@ -93,11 +93,16 @@ export async function runExtract(
   return { report, attempts: result.attempts, ms };
 }
 
-function addAttempts(usage: Usage, attempts: ClaudeAttempt[]) {
+const COST_SOURCE_RANK: Record<LlmCostSource, number> = { gateway: 0, estimated: 1, unknown: 2 };
+
+function addAttempts(usage: Usage, attempts: LlmAttempt[]) {
   for (const a of attempts) {
-    usage.claudeInputTokens += a.inputTokens;
-    usage.claudeOutputTokens += a.outputTokens;
-    usage.claudeAttempts += 1;
+    usage.llmInputTokens += a.inputTokens;
+    usage.llmOutputTokens += a.outputTokens;
+    usage.llmAttempts += 1;
+    usage.llmCostUsd += a.costUsd;
+    if (COST_SOURCE_RANK[a.costSource] > COST_SOURCE_RANK[usage.llmCostSource]) usage.llmCostSource = a.costSource;
+    if (a.ok) usage.llmResolvedModel = a.model;
   }
 }
 

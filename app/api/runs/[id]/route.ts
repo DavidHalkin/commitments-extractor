@@ -18,7 +18,7 @@ export async function GET(req: Request, { params }: Ctx) {
   ]);
   const wantRaw = new URL(req.url).searchParams.get("raw") === "1";
   const raw = wantRaw
-    ? { deepgram: await runs.getJson(id, "raw/deepgram.json"), claude: await runs.getJson(id, "raw/claude.json") }
+    ? { deepgram: await runs.getJson(id, "raw/deepgram.json"), llm: await runs.getJson(id, "raw/llm.json") }
     : undefined;
   return NextResponse.json({ run, report, transcript, raw });
 }

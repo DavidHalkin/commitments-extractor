@@ -146,26 +146,26 @@ export async function stageExtract(runs: Runs, run: Run): Promise<{ run: Run; re
   run.status = "extracting";
   run.failedStage = null;
   run.stageStartedAt = new Date().toISOString();
-  await runs.save(run); // counted write: marks this run in-flight before the paid Claude call
+  await runs.save(run); // counted write: marks this run in-flight before the paid LLM call
 
   let out: Awaited<ReturnType<typeof runExtract>>;
   try {
     out = await runExtract(transcript, logTo(run));
     addAttempts(run.usage, out.attempts);
     Object.assign(run.stageMs, out.ms);
-    await runs.putJson(run, "raw/claude.json", out.attempts.map((a) => a.raw));
+    await runs.putJson(run, "raw/llm.json", out.attempts.map((a) => a.raw));
   } catch (e) {
     const stage = e instanceof StageError ? e.stage : "extract";
     if (e instanceof StageError && e.attempts.length) {
       addAttempts(run.usage, e.attempts);
       try {
-        await runs.putJson(run, "raw/claude.json", e.attempts.map((a) => a.raw ?? { error: a.error }));
+        await runs.putJson(run, "raw/llm.json", e.attempts.map((a) => a.raw ?? { error: a.error }));
       } catch (writeErr) {
         addEvent(
           run,
           stage,
           "failed",
-          `Could not store the raw Claude response: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`,
+          `Could not store the raw LLM response: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`,
         );
       }
     }

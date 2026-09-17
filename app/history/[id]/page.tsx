@@ -115,7 +115,7 @@ export default function RunPage() {
         <details className="section-details">
           <summary>Raw API responses</summary>
           <h3>Deepgram</h3><pre>{JSON.stringify(raw.deepgram, null, 2)}</pre>
-          <h3>Claude</h3><pre>{JSON.stringify(raw.claude, null, 2)}</pre>
+          <h3>LLM (AI Gateway)</h3><pre>{JSON.stringify(raw.llm, null, 2)}</pre>
         </details>
       ) : null}
       <div className="danger-zone">

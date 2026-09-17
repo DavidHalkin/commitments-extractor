@@ -1,11 +1,17 @@
 import { formatMs, formatUsd } from "@/lib/format";
-import type { CostBreakdown, Stage, Usage } from "@/lib/types";
+import type { CostBreakdown, LlmCostSource, Stage, Usage } from "@/lib/types";
 
 export type MetricsLike = {
   stageMs: Partial<Record<Stage, number>>;
   timeToResultMs: number | null;
   usage: Usage;
   cost: CostBreakdown | null;
+};
+
+const COST_SOURCE_NOTE: Record<LlmCostSource, string> = {
+  gateway: "reported by AI Gateway",
+  estimated: "partly estimated from tokens at list price",
+  unknown: "incomplete: model missing from the price table",
 };
 
 const STAGES: { stage: Stage; label: string }[] = [
@@ -30,14 +36,14 @@ export function MetricsView({ metrics }: { metrics: MetricsLike }) {
             ))}
             <tr><th scope="row">Audio</th><td className="num">{(usage.audioSeconds / 60).toFixed(2)} min</td><td /></tr>
             <tr>
-              <th scope="row">Claude</th>
-              <td className="num">{usage.claudeInputTokens} in, {usage.claudeOutputTokens} out</td>
-              <td className="muted">{usage.claudeModel}, {usage.claudeAttempts} attempt(s)</td>
+              <th scope="row">LLM</th>
+              <td className="num">{usage.llmInputTokens} in, {usage.llmOutputTokens} out</td>
+              <td className="muted">{usage.llmResolvedModel ?? usage.llmModel} via AI Gateway, {usage.llmAttempts} attempt(s)</td>
             </tr>
             {cost ? (
               <>
                 <tr className="kv-group-start"><th scope="row">Recognition</th><td className="num">{formatUsd(cost.recognition)}</td><td /></tr>
-                <tr><th scope="row">Reasoning</th><td className="num">{formatUsd(cost.reasoning)}</td><td /></tr>
+                <tr><th scope="row">Reasoning</th><td className="num">{formatUsd(cost.reasoning)}</td><td className="muted">{COST_SOURCE_NOTE[usage.llmCostSource]}</td></tr>
                 <tr><th scope="row">Speech output</th><td className="num">{formatUsd(cost.speech)}</td><td className="muted">the product does not synthesize speech</td></tr>
                 <tr><th scope="row">Storage 30 days and operations</th><td className="num">{formatUsd(cost.storage + cost.storageOps)}</td><td /></tr>
                 <tr><th scope="row">Egress</th><td className="num">{formatUsd(cost.egress)}</td><td className="muted">one playback</td></tr>

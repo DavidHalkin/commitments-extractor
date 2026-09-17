@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { EXTRACT_MODEL } from "@/lib/extract/claude";
+import { EXTRACT_MODEL } from "@/lib/extract/llm";
 import { checkSize } from "@/lib/gate/classify";
 import { rejectionMessage } from "@/lib/limits";
 import { Runs } from "@/lib/runs/runs";

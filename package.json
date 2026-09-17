@@ -14,8 +14,8 @@
     "eval": "tsx --env-file=.env.local scripts/eval.mts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.126.0",
     "@google-cloud/storage": "^8.1.0",
+    "ai": "^7.0.105",
     "file-type": "^22.1.0",
     "music-metadata": "^11.15.0",
     "next": "16.3.5",

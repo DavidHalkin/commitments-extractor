@@ -1,12 +1,16 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { computeCost } from "@/lib/metrics";
-import { processAudio } from "@/lib/pipeline";
 import type { CostBreakdown, Usage } from "@/lib/types";
 import { scoreCase, type CaseScore, type Expected, type LineOffset } from "@/scripts/eval-lib";
 
+const arg = (name: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const CASES = ["01-normal", "02-changed", "03-clarify"];
-const runsPerCase = Number(process.argv.find((a) => a.startsWith("--runs="))?.split("=")[1] ?? 3);
+const runsPerCase = Number(arg("runs") ?? 3);
+// EXTRACT_MODEL is read when lib/extract/llm.ts loads, so the override must precede the pipeline import.
+const modelOverride = arg("model");
+if (modelOverride) process.env.EXTRACT_MODEL = modelOverride;
+const { processAudio } = await import("@/lib/pipeline");
 
 type RunResult = {
   case: string;
@@ -47,6 +51,14 @@ for (const name of CASES) {
   }
 }
 
+function modelLine(): string {
+  const used = results.filter((r) => r.usage.llmModel);
+  if (!used.length) return "?";
+  const served = [...new Set(used.map((r) => r.usage.llmResolvedModel).filter(Boolean))].join(", ") || "none succeeded";
+  const sources = [...new Set(used.map((r) => r.usage.llmCostSource))].join(", ");
+  return `${used[0].usage.llmModel} via AI Gateway (served by ${served}; LLM cost source: ${sources})`;
+}
+
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 await mkdir(path.join("eval", "results"), { recursive: true });
 await writeFile(path.join("eval", "results", `${stamp}.json`), JSON.stringify(results, null, 2));
@@ -54,7 +66,7 @@ await writeFile(path.join("eval", "results", `${stamp}.json`), JSON.stringify(re
 const lines: string[] = [
   `# Eval ${stamp}`,
   "",
-  `Runs per case: ${runsPerCase}. Model: ${results.find((r) => r.usage.claudeModel)?.usage.claudeModel ?? "?"}. API costs only (recognition + reasoning); infrastructure costs come from deployed runs.`,
+  `Runs per case: ${runsPerCase}. Model: ${modelLine()}. API costs only (recognition + reasoning); infrastructure costs come from deployed runs.`,
   "",
   "| Case | Status match | Items found | Field checks passed | must_not violations | Extra active items | STT misses | Median / max time | Median cost per op | Median cost per audio min |",
   "|---|---|---|---|---|---|---|---|---|---|",

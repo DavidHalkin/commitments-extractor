@@ -24,7 +24,7 @@ describe("newRunId", () => {
 
 describe("Runs", () => {
   it("creates a run with an upload target and persists run.json", async () => {
-    const { run, upload } = await runs.create({ name: "meeting.mp3", sizeBytes: 2048, declaredType: "audio/mpeg" }, "claude-sonnet-5");
+    const { run, upload } = await runs.create({ name: "meeting.mp3", sizeBytes: 2048, declaredType: "audio/mpeg" }, "anthropic/claude-sonnet-5");
     expect(upload).toEqual({ url: `/api/runs/${run.id}/upload`, method: "PUT", headers: {} });
     const loaded = await runs.get(run.id);
     expect(loaded?.status).toBe("created");
@@ -33,7 +33,7 @@ describe("Runs", () => {
   });
 
   it("appends events and stores JSON documents", async () => {
-    const { run } = await runs.create({ name: "a.mp3", sizeBytes: 2048, declaredType: "" }, "claude-sonnet-5");
+    const { run } = await runs.create({ name: "a.mp3", sizeBytes: 2048, declaredType: "" }, "anthropic/claude-sonnet-5");
     addEvent(run, "file-check", "rejected", "contains_video", 12.4);
     await runs.putJson(run, "transcript.json", { hello: "world" });
     await runs.save(run);
@@ -44,9 +44,9 @@ describe("Runs", () => {
   });
 
   it("lists newest first and deletes all objects of a run", async () => {
-    const a = await runs.create({ name: "a.mp3", sizeBytes: 2048, declaredType: "" }, "claude-sonnet-5");
+    const a = await runs.create({ name: "a.mp3", sizeBytes: 2048, declaredType: "" }, "anthropic/claude-sonnet-5");
     await new Promise((r) => setTimeout(r, 1100));
-    const b = await runs.create({ name: "b.mp3", sizeBytes: 2048, declaredType: "" }, "claude-sonnet-5");
+    const b = await runs.create({ name: "b.mp3", sizeBytes: 2048, declaredType: "" }, "anthropic/claude-sonnet-5");
     expect((await runs.list()).map((r) => r.file.name)).toEqual(["b.mp3", "a.mp3"]);
     expect(await runs.delete(a.run.id)).toBe(true);
     expect(await runs.get(a.run.id)).toBeNull();

@@ -7,12 +7,13 @@ export const PRICING = {
     source: "https://deepgram.com/pricing",
     note: "Pay-as-you-go, pre-recorded, English; speaker diarization and smart formatting included.",
   },
-  anthropic: {
+  llmFallback: {
     models: {
-      "claude-sonnet-5": { inputPerMTok: 2, outputPerMTok: 10 },
-      "claude-opus-5": { inputPerMTok: 5, outputPerMTok: 25 },
+      "anthropic/claude-sonnet-5": { inputPerMTok: 2, outputPerMTok: 10 },
+      "anthropic/claude-opus-5": { inputPerMTok: 5, outputPerMTok: 25 },
     } as Record<string, { inputPerMTok: number; outputPerMTok: number }>,
-    source: "https://docs.anthropic.com/en/docs/about-claude/pricing",
+    source: "https://vercel.com/ai-gateway/models",
+    note: "Used only when AI Gateway reports no cost for a generation. AI Gateway adds no markup to provider list prices.",
   },
   cloudRun: {
     vcpuSecond: 0.000024,

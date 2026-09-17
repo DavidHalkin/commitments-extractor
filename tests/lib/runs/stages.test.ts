@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { LlmAttempt } from "@/lib/extract/llm";
 import type { Extraction } from "@/lib/extract/schema";
 import { makeTranscript } from "../../helpers/transcript";
 
@@ -33,8 +34,8 @@ const extraction: Extraction = {
   ],
 };
 
-vi.mock("@/lib/extract/claude", () => ({
-  EXTRACT_MODEL: "claude-sonnet-5",
+vi.mock("@/lib/extract/llm", () => ({
+  EXTRACT_MODEL: "anthropic/claude-sonnet-5",
   ExtractionError: class ExtractionError extends Error {
     attempts: unknown[];
     constructor(message: string, attempts: unknown[]) {
@@ -44,7 +45,7 @@ vi.mock("@/lib/extract/claude", () => ({
   },
   extractCommitments: vi.fn(async () => ({
     extraction,
-    attempts: [{ ok: true, stopReason: "end_turn", inputTokens: 1200, outputTokens: 400, raw: {} }],
+    attempts: [{ ok: true, finishReason: "stop", inputTokens: 1200, outputTokens: 400, costUsd: 0.0064, costSource: "gateway", model: "anthropic/claude-sonnet-5", generationId: "gen_1", raw: {} }],
   })),
 }));
 
@@ -52,7 +53,7 @@ const { LocalStore } = await import("@/lib/store/local");
 const { Runs } = await import("@/lib/runs/runs");
 const { ConflictError, stageExtract, stageTranscribe } = await import("@/lib/runs/stages");
 const { transcribeBytes } = await import("@/lib/stt/deepgram");
-const { extractCommitments, ExtractionError } = await import("@/lib/extract/claude");
+const { extractCommitments, ExtractionError } = await import("@/lib/extract/llm");
 
 const defaultTranscribeImpl = vi.mocked(transcribeBytes).getMockImplementation()!;
 const defaultExtractImpl = vi.mocked(extractCommitments).getMockImplementation()!;
@@ -74,7 +75,7 @@ afterEach(() => rmSync(root, { recursive: true, force: true }));
 
 async function uploaded(fixture: string) {
   const bytes = new Uint8Array(readFileSync(path.join("testset", "invalid", fixture)));
-  const { run } = await runs.create({ name: fixture, sizeBytes: bytes.byteLength, declaredType: "audio/mpeg" }, "claude-sonnet-5");
+  const { run } = await runs.create({ name: fixture, sizeBytes: bytes.byteLength, declaredType: "audio/mpeg" }, "anthropic/claude-sonnet-5");
   await store.put(runs.audioKey(run.id), bytes, "application/octet-stream");
   return run;
 }
@@ -98,7 +99,9 @@ describe("stages", () => {
     expect(done.status).toBe("done");
     expect(done.reportStatus).toBe("ok");
     expect(report?.items[0].owner.name).toBe("Mark");
-    expect(report?.metrics?.usage.claudeInputTokens).toBe(1200);
+    expect(report?.metrics?.usage.llmInputTokens).toBe(1200);
+    expect(report?.metrics?.usage.llmResolvedModel).toBe("anthropic/claude-sonnet-5");
+    expect(report?.metrics?.cost.reasoning).toBeCloseTo(0.0064, 9);
     expect(report?.metrics?.cost.total).toBeGreaterThan(0);
     expect(done.events.map((e) => `${e.stage}:${e.type}`)).toEqual([
       "upload:started", "upload:finished", "file-check:started", "file-check:finished",
@@ -111,7 +114,7 @@ describe("stages", () => {
   });
 
   it("marks a run failed when the upload never arrived", async () => {
-    const { run } = await runs.create({ name: "x.mp3", sizeBytes: 5000, declaredType: "" }, "claude-sonnet-5");
+    const { run } = await runs.create({ name: "x.mp3", sizeBytes: 5000, declaredType: "" }, "anthropic/claude-sonnet-5");
     const after = await stageTranscribe(runs, run);
     expect(after).toMatchObject({ status: "failed", failedStage: "upload" });
   });
@@ -131,13 +134,13 @@ describe("stages", () => {
     expect(after.status).toBe("transcribed");
   });
 
-  it("counts every Claude attempt, even failed ones, when extraction fails", async () => {
+  it("counts every LLM attempt, even failed ones, when extraction fails", async () => {
     const run = await uploaded("wav-renamed.mp3");
     const transcribed = await stageTranscribe(runs, run);
 
-    const attempts = [
-      { ok: false, stopReason: "max_tokens", inputTokens: 1000, outputTokens: 16000, error: "truncated", raw: { truncated: true } },
-      { ok: false, stopReason: null, inputTokens: 0, outputTokens: 0, error: "network error", raw: null },
+    const attempts: LlmAttempt[] = [
+      { ok: false, finishReason: "length", inputTokens: 1000, outputTokens: 16000, costUsd: 0.162, costSource: "estimated", model: "anthropic/claude-sonnet-5", generationId: null, error: "truncated", raw: { truncated: true } },
+      { ok: false, finishReason: null, inputTokens: 0, outputTokens: 0, costUsd: 0, costSource: "gateway", model: "anthropic/claude-sonnet-5", generationId: null, error: "network error", raw: null },
     ];
     vi.mocked(extractCommitments).mockRejectedValueOnce(new ExtractionError("Extraction failed after 2 attempts", attempts));
 
@@ -145,11 +148,14 @@ describe("stages", () => {
     expect(report).toBeNull();
     expect(failed.status).toBe("failed");
     expect(failed.failedStage).toBe("extract");
-    expect(failed.usage.claudeInputTokens).toBe(1000);
-    expect(failed.usage.claudeOutputTokens).toBe(16000);
-    expect(failed.usage.claudeAttempts).toBe(2);
+    expect(failed.usage.llmInputTokens).toBe(1000);
+    expect(failed.usage.llmOutputTokens).toBe(16000);
+    expect(failed.usage.llmAttempts).toBe(2);
+    expect(failed.usage.llmCostUsd).toBeCloseTo(0.162, 9);
+    expect(failed.usage.llmCostSource).toBe("estimated");
+    expect(failed.usage.llmResolvedModel).toBeNull();
     expect(failed.cost).not.toBeNull();
-    expect(await runs.getJson(failed.id, "raw/claude.json")).not.toBeNull();
+    expect(await runs.getJson(failed.id, "raw/llm.json")).not.toBeNull();
   });
 
   it("guards a concurrent extract in flight and recovers once it is stale", async () => {

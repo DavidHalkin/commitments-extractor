@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { computeCost, emptyUsage } from "@/lib/metrics";
 
 describe("computeCost", () => {
-  it("prices recognition and reasoning per audio minute", () => {
-    const u = { ...emptyUsage("claude-sonnet-5"), audioSeconds: 120, claudeInputTokens: 10_000, claudeOutputTokens: 3_000, vcpu: 0, memoryGib: 0 };
+  it("prices recognition and takes reasoning cost from the recorded LLM cost", () => {
+    const u = { ...emptyUsage("anthropic/claude-sonnet-5"), audioSeconds: 120, llmInputTokens: 10_000, llmOutputTokens: 3_000, llmCostUsd: 0.05, vcpu: 0, memoryGib: 0 };
     const c = computeCost(u);
     expect(c.recognition).toBeCloseTo(0.0086, 6);
     expect(c.reasoning).toBeCloseTo(0.05, 6);
@@ -14,7 +14,7 @@ describe("computeCost", () => {
 
   it("includes storage, operations, egress and compute", () => {
     const u = {
-      ...emptyUsage("claude-sonnet-5"),
+      ...emptyUsage("anthropic/claude-sonnet-5"),
       audioSeconds: 60,
       gcsClassA: 8,
       gcsClassB: 3,
@@ -31,10 +31,6 @@ describe("computeCost", () => {
   });
 
   it("returns null per-minute cost when no audio was processed", () => {
-    expect(computeCost(emptyUsage("claude-sonnet-5")).perAudioMinute).toBeNull();
-  });
-
-  it("fails loudly for an unpriced model", () => {
-    expect(() => computeCost(emptyUsage("unknown-model"))).toThrow("No pricing");
+    expect(computeCost(emptyUsage("anthropic/claude-sonnet-5")).perAudioMinute).toBeNull();
   });
 });

@@ -4,7 +4,7 @@ export type RunDetail = {
   run: Run;
   report: Report | null;
   transcript: Transcript | null;
-  raw?: { deepgram: unknown; claude: unknown };
+  raw?: { deepgram: unknown; llm: unknown };
 };
 
 export async function api<T>(url: string, init?: RequestInit): Promise<T> {

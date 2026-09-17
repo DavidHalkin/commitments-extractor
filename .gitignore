@@ -49,3 +49,6 @@ testset/*/.work/
 
 # personal task list
 todo.md
+
+# gstack browse daemon state
+.gstack/

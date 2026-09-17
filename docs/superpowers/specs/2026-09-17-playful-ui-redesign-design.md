@@ -132,7 +132,7 @@ export const TYPICAL_MS = { transcribe: 3_000, extract: 55_000 };
 
 /** Overall percent (0–100, integer) for the current step states at time `now`. */
 export function progressPercent(steps: Steps, now: number): number;
-/** The step to show: the running or failed one, else the last done one. */
+/** The step to show: the first step that is not done (running, failed or pending), else the last one. */
 export function currentStep(steps: Steps): { name: StepName; index: number; status: StepStatus };
 ```
 
@@ -190,7 +190,7 @@ matching today's handling.
 - **Row, expanded**: owner and deadline quotes with ▶ (existing `EvidenceLine`), flags as warning
   lines with their current texts, and the event timeline ("proposed", "accepted", …) with ▶.
   Clarification rows show the question and its quote. Dropped rows show summary and reason.
-- **Speakers** line under the list: names with their introduction quote ▶.
+- **Speakers** as a collapsed group under the list: names with their introduction quote ▶.
 - **Timeline markers** keep their link to rows through `TimelineLinkProvider`: activating a marker
   expands and highlights its row and scrolls it into view; playing a row's quote highlights the marker.
 

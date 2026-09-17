@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Literata, Schibsted_Grotesk } from "next/font/google";
+import { Fredoka, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
-const uiFont = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-ui", display: "swap" });
-const quoteFont = Literata({ subsets: ["latin"], variable: "--font-quote", display: "swap" });
+const displayFont = Fredoka({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
+const bodyFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Commitments from recordings",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${uiFont.variable} ${quoteFont.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
         <header className="site-header">
           <div className="site-header-inner">
@@ -22,8 +22,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/">New upload</Link>
               <Link href="/history">History</Link>
             </nav>
-            <p className="notice">Uploads are visible to everyone who opens this demo and are deleted after 30 days.</p>
           </div>
+          <p className="notice">Uploads are visible to everyone who opens this demo and are deleted after 30 days.</p>
         </header>
         <main className="page">{children}</main>
       </body>

@@ -3,11 +3,11 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { api, type RunDetail } from "@/app/components/api";
+import { CommitmentList } from "@/app/components/CommitmentList";
 import { EventLog } from "@/app/components/EventLog";
 import { MetricsView } from "@/app/components/MetricsView";
 import { RecordingTimeline } from "@/app/components/RecordingTimeline";
 import { buildMarkers } from "@/app/components/reportModel";
-import { ReportView } from "@/app/components/ReportView";
 import { runBadge, runTone } from "@/app/components/runBadge";
 import { StatusMark } from "@/app/components/StatusMark";
 import { TimelineLinkProvider } from "@/app/components/timelineLink";
@@ -68,18 +68,20 @@ export default function RunPage() {
     }
   }
 
-  if (error) return <div className="banner tone-setaside" role="alert"><p className="banner-text">{error}</p></div>;
+  if (error) return <div className="notice-card tone-setaside" role="alert"><p>{error}</p></div>;
   if (!detail) return <p className="muted">Loading…</p>;
   const { run, report, transcript, raw } = detail;
   const names = new Map((report?.speakers ?? []).filter((s) => s.name).map((s) => [s.speaker, s.name as string]));
 
   return (
     <TimelineLinkProvider>
-      <header className="page-intro">
-        <h1 className="run-title">{run.file.name}</h1>
+      <header className="run-header card">
+        <div className="run-header-top">
+          <h1 className="run-title">{run.file.name}</h1>
+          <StatusMark tone={runTone(run)}>{runBadge(run)}</StatusMark>
+        </div>
         <dl className="meta">
           <div><dt>Uploaded (UTC)</dt><dd>{run.createdAt.replace("T", " ").slice(0, 19)}</dd></div>
-          <div><dt>Status</dt><dd><StatusMark tone={runTone(run)}>{runBadge(run)}</StatusMark></dd></div>
           <div><dt>Duration</dt><dd>{run.file.durationSec?.toFixed(1) ?? "—"} s</dd></div>
           <div><dt>Size</dt><dd>{(run.file.sizeBytes / 1024 / 1024).toFixed(2)} MB</dd></div>
           <div><dt>Declared type</dt><dd>{run.file.declaredType || "none"}</dd></div>
@@ -97,29 +99,32 @@ export default function RunPage() {
         missingAudioNote={audio === null ? "Audio not available." : undefined}
       />
       {run.rejection ? (
-        <div className="banner tone-setaside" role="alert">
-          <p className="banner-title">Rejected ({run.rejection.code})</p>
-          <p className="banner-text">{run.rejection.message}</p>
+        <div className="notice-card tone-setaside" role="alert">
+          <p className="notice-card-title">File rejected ({run.rejection.code})</p>
+          <p>{run.rejection.message}</p>
         </div>
       ) : null}
 
-      {report ? <ReportView report={report} onPlay={playSegment} /> : null}
-      {transcript ? <TranscriptView transcript={transcript} onPlay={playSegment} names={names} /> : null}
+      {report ? <CommitmentList report={report} onPlay={playSegment} /> : null}
 
-      <section className="report-section">
-        <h2>What happened</h2>
-        <EventLog events={run.events} />
-      </section>
-      <MetricsView metrics={{ stageMs: run.stageMs, timeToResultMs: run.timeToResultMs, usage: run.usage, cost: run.cost }} />
-      {raw ? (
+      <details className="details card">
+        <summary>Details</summary>
+        {transcript ? <TranscriptView transcript={transcript} onPlay={playSegment} names={names} /> : null}
         <details className="section-details">
-          <summary>Raw API responses</summary>
-          <h3>Deepgram</h3><pre>{JSON.stringify(raw.deepgram, null, 2)}</pre>
-          <h3>LLM (AI Gateway)</h3><pre>{JSON.stringify(raw.llm, null, 2)}</pre>
+          <summary>What happened</summary>
+          <EventLog events={run.events} />
         </details>
-      ) : null}
+        <MetricsView metrics={{ stageMs: run.stageMs, timeToResultMs: run.timeToResultMs, usage: run.usage, cost: run.cost }} />
+        {raw ? (
+          <details className="section-details">
+            <summary>Raw API responses</summary>
+            <h3>Deepgram</h3><pre>{JSON.stringify(raw.deepgram, null, 2)}</pre>
+            <h3>LLM (AI Gateway)</h3><pre>{JSON.stringify(raw.llm, null, 2)}</pre>
+          </details>
+        ) : null}
+      </details>
       <div className="danger-zone">
-        {deleteError ? <div className="banner tone-setaside" role="alert"><p className="banner-text">{deleteError}</p></div> : null}
+        {deleteError ? <div className="notice-card tone-setaside" role="alert"><p>{deleteError}</p></div> : null}
         <button type="button" className="btn btn-danger" onClick={() => void remove()}>Delete run</button>
       </div>
     </TimelineLinkProvider>

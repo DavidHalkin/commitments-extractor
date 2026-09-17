@@ -33,40 +33,32 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <header className="page-intro">
+      <header className="hero hero-small">
         <h1>History</h1>
         <p className="lede">Every upload and what happened to it, newest first.</p>
       </header>
-      {error ? <div className="banner tone-setaside" role="alert"><p className="banner-text">{error}</p></div> : null}
+      {error ? <div className="notice-card tone-setaside" role="alert"><p>{error}</p></div> : null}
       {runs === null && !error ? <p className="muted">Loading…</p> : null}
-      {runs?.length === 0 ? <p className="empty-note">No uploads yet. <Link href="/">Upload a recording</Link> to see it here.</p> : null}
+      {runs?.length === 0 ? (
+        <div className="notice-card tone-neutral"><p>No uploads yet. <Link href="/">Upload a recording</Link> to see it here.</p></div>
+      ) : null}
       {runs && runs.length > 0 ? (
-        <div className="scroll">
-          <table className="data-table history-table">
-            <thead>
-              <tr>
-                <th scope="col">Date (UTC)</th>
-                <th scope="col">File</th>
-                <th scope="col">Duration</th>
-                <th scope="col">Status</th>
-                <th scope="col" className="num">Time to result</th>
-                <th scope="col" className="num">Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              {runs.map((r) => (
-                <tr key={r.id}>
-                  <td className="cell-date nowrap"><Link href={`/history/${r.id}`}>{r.createdAt.replace("T", " ").slice(0, 19)}</Link></td>
-                  <td className="cell-file">{r.file.name}</td>
-                  <td className="cell-duration"><DurationBar run={r} /></td>
-                  <td className="cell-status nowrap"><StatusMark tone={runTone(r)}>{runBadge(r)}</StatusMark></td>
-                  <td className="cell-time num"><span className="cell-label">Time to result </span>{formatMs(r.timeToResultMs)}</td>
-                  <td className="cell-cost num">{formatUsd(r.cost?.total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="run-list">
+          {runs.map((r) => (
+            <li key={r.id}>
+              <Link href={`/history/${r.id}`} className="run-card">
+                <span className="run-card-status"><StatusMark tone={runTone(r)}>{runBadge(r)}</StatusMark></span>
+                <span className="run-card-file">{r.file.name}</span>
+                <span className="run-card-date">{r.createdAt.replace("T", " ").slice(0, 16)} UTC</span>
+                <span className="run-card-duration"><DurationBar run={r} /></span>
+                <span className="run-card-numbers">
+                  <span><span className="sr-only">Time to result </span>{formatMs(r.timeToResultMs)}</span>
+                  <span><span className="sr-only">Cost </span>{formatUsd(r.cost?.total)}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : null}
     </div>
   );

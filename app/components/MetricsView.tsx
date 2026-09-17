@@ -25,7 +25,7 @@ const STAGES: { stage: Stage; label: string }[] = [
 export function MetricsView({ metrics }: { metrics: MetricsLike }) {
   const { stageMs, timeToResultMs, usage, cost } = metrics;
   return (
-    <details open className="section-details">
+    <details className="section-details">
       <summary>Speed and cost</summary>
       <div className="scroll">
         <table className="data-table kv-table">

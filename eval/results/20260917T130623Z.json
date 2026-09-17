@@ -1,0 +1,1709 @@
+[
+  {
+    "case": "01-normal",
+    "run": 1,
+    "totalMs": 57053.622,
+    "stageMs": {
+      "file-check": 101.34230000000002,
+      "transcribe": 1870.4776000000002,
+      "precheck": 0.11940000000004147,
+      "extract": 55070.878899999996,
+      "verify": 10.25630000000092
+    },
+    "usage": {
+      "audioSeconds": 75.575935,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1726,
+      "llmOutputTokens": 5302,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0106611,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.005416275341666667,
+      "reasoning": 0.0106611,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.016077375341666665,
+      "perAudioMinute": 0.012763884700864103
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": false,
+          "detail": "got cancelled, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.9, 15.0"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday., expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "20.6, 22.3, 22.3, 68.5"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Hold the client demo on Friday"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday then., expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "35.6 s “The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "26.6, 29.2, 35.6, 35.6, 71.6"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send out the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got cancelled, expected cancelled"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "40.7, 48.1"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": false,
+          "detail": "got not_accepted, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": false,
+          "detail": "got null, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": false,
+          "detail": "no evidence"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": false,
+          "detail": "got [], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "50.5, 53.9"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.5, 62.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@62.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "01-normal",
+    "run": 2,
+    "totalMs": 55371.134099999996,
+    "stageMs": {
+      "file-check": 3.3980999999912456,
+      "transcribe": 1552.2089000000124,
+      "precheck": 0.01059999999415595,
+      "extract": 53812.321400000015,
+      "verify": 3.1057999999902677
+    },
+    "usage": {
+      "audioSeconds": 75.575935,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1726,
+      "llmOutputTokens": 4983,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0100231,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.005416275341666667,
+      "reasoning": 0.0100231,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.015439375341666667,
+      "perAudioMinute": 0.012257374262058418
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": false,
+          "detail": "got cancelled, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.9, 15.0"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API docs"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "20.6, 22.3"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo scheduled"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "35.1 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "26.6, 29.2, 35.1"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got cancelled, expected cancelled"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "40.7, 47.2"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": false,
+          "detail": "got not_accepted, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": false,
+          "detail": "got null, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": false,
+          "detail": "no evidence"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": false,
+          "detail": "got [], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "50.5, 53.9"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.5, 62.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@62.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "01-normal",
+    "run": 3,
+    "totalMs": 79529.1159,
+    "stageMs": {
+      "file-check": 2.8030999999900814,
+      "transcribe": 2182.67300000001,
+      "precheck": 0.013300000020535663,
+      "extract": 77340.668,
+      "verify": 2.8755999999993946
+    },
+    "usage": {
+      "audioSeconds": 75.575935,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1726,
+      "llmOutputTokens": 6424,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0132795,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.005416275341666667,
+      "reasoning": 0.0132795,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.018695775341666665,
+      "perAudioMinute": 0.014842641649091074
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": false,
+          "detail": "got cancelled, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.9, 15.0"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API docs"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "22.3 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "20.6, 22.3, 68.5"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo scheduled"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "35.1 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "25.4, 29.2, 35.1"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got cancelled, expected cancelled"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "40.7, 48.1"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": true,
+          "detail": "got before next Tuesday, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": true,
+          "detail": "53.9 s “Someone should book the room before next Tuesday.”"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "50.5, 53.0, 53.9"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "58.5, 62.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@62.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 1,
+    "totalMs": 66057.8077,
+    "stageMs": {
+      "file-check": 6.205900000000838,
+      "transcribe": 3732.5885000000126,
+      "precheck": 0.012800000025890768,
+      "extract": 62316.9595,
+      "verify": 1.8512000000337139
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1712,
+      "llmOutputTokens": 5489,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.011406,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.011406,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01689107527,
+      "perAudioMinute": 0.013241682216878678
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 4,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday., expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "21.2, 69.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo scheduling"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.4 s “Okay. The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "25.6, 28.9, 36.4, 72.4"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": false,
+          "detail": "no item has a quote containing the anchor"
+        },
+        {
+          "name": "book the room: found",
+          "pass": false,
+          "detail": "no item has a quote containing the anchor"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "59.5, 66.3"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@66.3"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [
+        "Send out the customer survey"
+      ],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 2,
+    "totalMs": 54620.39990000002,
+    "stageMs": {
+      "file-check": 2.9386999999987893,
+      "transcribe": 2287.0574999999953,
+      "precheck": 0.08000000001629815,
+      "extract": 52329.144299999985,
+      "verify": 1.025900000007823
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1712,
+      "llmOutputTokens": 4880,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0098136,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.0098136,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01529867527,
+      "perAudioMinute": 0.011993327424474889
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 6,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.3"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday, expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "21.2, 21.2, 69.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Hold the client demo on Friday"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": false,
+          "detail": "got null, expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": false,
+          "detail": "no evidence"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": false,
+          "detail": "got [deadline_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "24.7, 28.9, 36.4, 72.4"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": true,
+          "detail": "Send the customer survey"
+        },
+        {
+          "name": "customer survey: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "customer survey: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "customer survey: owner",
+          "pass": false,
+          "detail": "got Anna, the project manager, expected Anna"
+        },
+        {
+          "name": "customer survey: owner evidence line",
+          "pass": true,
+          "detail": "49.6 s “I'll send it out myself.”"
+        },
+        {
+          "name": "customer survey: deadline",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "customer survey: flags",
+          "pass": true,
+          "detail": "got [deadline_missing], expected [deadline_missing]"
+        },
+        {
+          "name": "customer survey: evidence timestamp",
+          "pass": true,
+          "detail": "39.3, 47.8"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": false,
+          "detail": "got not_accepted, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": false,
+          "detail": "got null, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": false,
+          "detail": "no evidence"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": false,
+          "detail": "got [], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "51.7, 51.7"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Whether the budget for the extra servers has been approved"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "59.5, 63.2"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@63.2"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "02-changed",
+    "run": 3,
+    "totalMs": 93016.19909999997,
+    "stageMs": {
+      "file-check": 2.6449000000138767,
+      "transcribe": 1655.784399999946,
+      "precheck": 0.011200000008102506,
+      "extract": 91356.42000000004,
+      "verify": 1.2410999999847263
+    },
+    "usage": {
+      "audioSeconds": 76.535934,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1712,
+      "llmOutputTokens": 5927,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0119076,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.00548507527,
+      "reasoning": 0.0119076,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.01739267527,
+      "perAudioMinute": 0.013634909272812953
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "ok",
+      "expectedItems": 6,
+      "found": 5,
+      "checks": [
+        {
+          "name": "landing page: found",
+          "pass": true,
+          "detail": "Redo the landing page"
+        },
+        {
+          "name": "landing page: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "landing page: final_status",
+          "pass": true,
+          "detail": "got not_accepted, expected not_accepted"
+        },
+        {
+          "name": "landing page: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "landing page: evidence timestamp",
+          "pass": true,
+          "detail": "9.8"
+        },
+        {
+          "name": "API docs: found",
+          "pass": true,
+          "detail": "Write the API documentation"
+        },
+        {
+          "name": "API docs: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "API docs: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "API docs: owner",
+          "pass": true,
+          "detail": "got Mark, expected Mark"
+        },
+        {
+          "name": "API docs: owner evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: deadline",
+          "pass": true,
+          "detail": "got by Wednesday., expected Wednesday"
+        },
+        {
+          "name": "API docs: deadline evidence line",
+          "pass": true,
+          "detail": "21.2 s “I'll write the API docs by Wednesday.”"
+        },
+        {
+          "name": "API docs: flags",
+          "pass": true,
+          "detail": "got [date_context_missing], expected [date_context_missing]"
+        },
+        {
+          "name": "API docs: evidence timestamp",
+          "pass": true,
+          "detail": "21.2, 69.2"
+        },
+        {
+          "name": "client demo: found",
+          "pass": true,
+          "detail": "Client demo scheduled"
+        },
+        {
+          "name": "client demo: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "client demo: final_status",
+          "pass": true,
+          "detail": "got active, expected active"
+        },
+        {
+          "name": "client demo: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "client demo: deadline",
+          "pass": true,
+          "detail": "got on Friday then., expected Friday"
+        },
+        {
+          "name": "client demo: deadline evidence line",
+          "pass": true,
+          "detail": "36.8 s “The client demo is on Friday then.”"
+        },
+        {
+          "name": "client demo: flags",
+          "pass": true,
+          "detail": "got [date_context_missing,owner_missing], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "client demo: evidence timestamp",
+          "pass": true,
+          "detail": "28.9, 36.8, 72.4"
+        },
+        {
+          "name": "customer survey: found",
+          "pass": false,
+          "detail": "no item has a quote containing the anchor"
+        },
+        {
+          "name": "book the room: found",
+          "pass": true,
+          "detail": "Book the room for the demo"
+        },
+        {
+          "name": "book the room: kind",
+          "pass": true,
+          "detail": "got task, expected task"
+        },
+        {
+          "name": "book the room: final_status",
+          "pass": false,
+          "detail": "got not_accepted, expected active"
+        },
+        {
+          "name": "book the room: owner",
+          "pass": true,
+          "detail": "got null, expected null"
+        },
+        {
+          "name": "book the room: deadline",
+          "pass": false,
+          "detail": "got null, expected next Tuesday"
+        },
+        {
+          "name": "book the room: deadline evidence line",
+          "pass": false,
+          "detail": "no evidence"
+        },
+        {
+          "name": "book the room: flags",
+          "pass": false,
+          "detail": "got [], expected [date_context_missing,owner_missing]"
+        },
+        {
+          "name": "book the room: evidence timestamp",
+          "pass": true,
+          "detail": "55.2"
+        },
+        {
+          "name": "budget: found",
+          "pass": true,
+          "detail": "Has the budget for the extra servers been approved?"
+        },
+        {
+          "name": "budget: kind",
+          "pass": true,
+          "detail": "got open_question, expected open_question"
+        },
+        {
+          "name": "budget: final_status",
+          "pass": true,
+          "detail": "got open, expected open"
+        },
+        {
+          "name": "budget: flags",
+          "pass": true,
+          "detail": "got [], expected []"
+        },
+        {
+          "name": "budget: evidence timestamp",
+          "pass": true,
+          "detail": "59.5, 64.8"
+        },
+        {
+          "name": "clarification question @ lines 15/16",
+          "pass": true,
+          "detail": "question@64.8"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [
+        "Send the customer survey"
+      ],
+      "extraOther": [],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 1,
+    "totalMs": 62220.008700000006,
+    "stageMs": {
+      "file-check": 2.8691999999573454,
+      "transcribe": 1938.8274999998976,
+      "precheck": 0.009099999908357859,
+      "extract": 60277.70539999998,
+      "verify": 0.5104000000283122
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1502,
+      "llmOutputTokens": 5216,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0104907,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0104907,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.013235815413333334,
+      "perAudioMinute": 0.02073282820856844
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@18.8, question@27.1"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": false,
+          "detail": "owner@18.8, question@27.1"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: Discuss the client report",
+        "not_accepted: Take the client report this time (request to Mark)",
+        "open: When is the client report due?",
+        "not_accepted: Update the road map"
+      ],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 2,
+    "totalMs": 43347.596099999966,
+    "stageMs": {
+      "file-check": 3.741299999994226,
+      "transcribe": 1444.0302000000374,
+      "precheck": 0.0102999999653548,
+      "extract": 41899.32569999993,
+      "verify": 0.3840000000782311
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1502,
+      "llmOutputTokens": 4057,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0081727,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0081727,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.010917815413333334,
+      "perAudioMinute": 0.01710186976085173
+    },
+    "score": {
+      "statusMatch": true,
+      "status": "needs_clarification",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@18.8, deadline@27.1, question@27.1"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@18.8, deadline@27.1, question@27.1"
+        }
+      ],
+      "mustNotViolations": [],
+      "extraActive": [],
+      "extraOther": [
+        "not_accepted: Take the client report this time",
+        "not_accepted: Update the road map",
+        "open: When is the client report due (Thursday or Friday)?"
+      ],
+      "sttMisses": []
+    }
+  },
+  {
+    "case": "03-clarify",
+    "run": 3,
+    "totalMs": 44978.2916,
+    "stageMs": {
+      "file-check": 3.404699999955483,
+      "transcribe": 1934.4900999999372,
+      "precheck": 0.013099999981932342,
+      "extract": 43039.82289999991,
+      "verify": 0.34629999997559935
+    },
+    "usage": {
+      "audioSeconds": 38.303936,
+      "llmModel": "openai/gpt-5-mini",
+      "llmResolvedModel": "openai/gpt-5-mini",
+      "llmInputTokens": 1502,
+      "llmOutputTokens": 4328,
+      "llmAttempts": 1,
+      "llmCostUsd": 0.0087147,
+      "llmCostSource": "gateway",
+      "blobAdvancedOps": 0,
+      "blobSimpleOps": 0,
+      "storedBytes": 0,
+      "retentionDays": 0,
+      "blobTransferBytes": 0,
+      "fnInvocations": 0,
+      "fnWallSeconds": 0,
+      "fnCpuSeconds": 0,
+      "fnMemoryGb": 0
+    },
+    "cost": {
+      "recognition": 0.002745115413333333,
+      "reasoning": 0.0087147,
+      "speech": 0,
+      "storage": 0,
+      "storageOps": 0,
+      "egress": 0,
+      "compute": 0,
+      "total": 0.011459815413333335,
+      "perAudioMinute": 0.01795086867313062
+    },
+    "score": {
+      "statusMatch": false,
+      "status": "ok",
+      "expectedItems": 0,
+      "found": 0,
+      "checks": [
+        {
+          "name": "clarification owner @ lines 4/5/6",
+          "pass": true,
+          "detail": "owner@18.8, deadline@27.1, question@27.1"
+        },
+        {
+          "name": "clarification deadline @ lines 7/8",
+          "pass": true,
+          "detail": "owner@18.8, deadline@27.1, question@27.1"
+        }
+      ],
+      "mustNotViolations": [
+        "{\"final_status\":\"active\"} violated by \"Update the road map\"",
+        "{\"has_deadline\":true} violated by \"Update the road map\""
+      ],
+      "extraActive": [
+        "Update the road map"
+      ],
+      "extraOther": [
+        "not_accepted: Take the client report this time",
+        "open: When is the client report due (Thursday or Friday)?"
+      ],
+      "sttMisses": []
+    }
+  }
+]

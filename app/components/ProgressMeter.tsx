@@ -17,7 +17,7 @@ const TICK_MS = 250;
 /** One large bar for the whole run: percent, current step, elapsed time and a plain-language line. */
 export function ProgressMeter({ steps, error }: { steps: Steps; error: string | null }) {
   const running = ORDER.some((name) => steps[name].status === "running");
-  const [now, setNow] = useState(() => performance.now());
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     if (!running) return;
@@ -25,13 +25,13 @@ export function ProgressMeter({ steps, error }: { steps: Steps; error: string | 
     return () => window.clearInterval(id);
   }, [running]);
 
-  // `now` only matters while a step runs; finished and failed steps do not depend on time.
+  // `now` comes from the interval tick while a step runs (0 before the first tick); finished and failed steps do not depend on time.
   const percent = progressPercent(steps, now);
   const step = currentStep(steps);
   const state = steps[step.name];
   const finished = allDone(steps);
   const failed = step.status === "failed";
-  const elapsedMs = state.status === "running" && state.startedAt != null ? now - state.startedAt : state.ms;
+  const elapsedMs = state.status === "running" && state.startedAt != null ? Math.max(0, now - state.startedAt) : state.ms;
   const title = finished ? "Done" : STEP_LABEL[step.name];
   const announcement = failed ? `${STEP_LABEL[step.name]} failed` : finished ? "Done" : STEP_LABEL[step.name];
 

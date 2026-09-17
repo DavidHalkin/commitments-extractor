@@ -3,6 +3,10 @@
 Date: 2026-09-16
 Source brief: `TS.md`
 
+> **Amended 2026-09-17:** hosting moved to Vercel (Blob, Fluid compute, Cron) and reasoning now goes
+> through Vercel AI Gateway via the AI SDK. See `2026-09-17-vercel-ai-gateway-design.md`, which wins
+> where the two disagree. Cloud Run / GCS sections below are kept as history.
+
 ## 1. Goal
 
 A browser app where a user uploads a recorded project discussion (English, two speakers who

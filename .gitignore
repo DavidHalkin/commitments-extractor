@@ -46,3 +46,6 @@ testset/*/.work/
 
 # controller scratch workspace (never commit)
 .superpowers/
+
+# personal task list
+todo.md

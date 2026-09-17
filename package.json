@@ -11,7 +11,8 @@
     "test": "vitest run",
     "fixtures": "tsx scripts/make-invalid-fixtures.ts",
     "synth": "tsx --env-file=.env.local scripts/synthesize.ts",
-    "eval": "tsx --env-file=.env.local scripts/eval.mts"
+    "eval": "tsx --env-file=.env.local scripts/eval.mts",
+    "smoke": "tsx scripts/smoke.mts"
   },
   "dependencies": {
     "@vercel/blob": "^2.8.0",

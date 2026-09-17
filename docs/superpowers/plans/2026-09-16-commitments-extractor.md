@@ -1,5 +1,8 @@
 # Commitments Extractor Implementation Plan
 
+> **Superseded in part (2026-09-17):** Task 13 Step 6 onward and Tasks 14–15 are replaced by
+> `docs/superpowers/plans/2026-09-17-vercel-ai-gateway.md` (Vercel hosting, AI Gateway extraction).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A browser app that turns an uploaded ≤3-minute two-speaker English recording into a verified list of final commitments (tasks, owners, deadlines, open questions) with playable timestamped quotes, a shared run history, measured speed/cost, a reproducible test set, and GitHub → Cloud Run deployment.

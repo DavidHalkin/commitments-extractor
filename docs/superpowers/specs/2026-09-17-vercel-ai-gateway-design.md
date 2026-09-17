@@ -63,7 +63,7 @@ Daily 03:00 UTC: Vercel Cron → GET /api/cron/cleanup → delete runs/<id>/ old
 | `get` | `get(key, { access: "private", useCache: false })`; `null` when not found. `useCache: false` because `run.json` is overwritten after every stage and the CDN may serve a version up to 60 s old otherwise |
 | `listDirs` | `list({ prefix, mode: "folded" })`, paginated by `cursor`; returns folder names without the prefix |
 | `deletePrefix` | `list({ prefix })` paginated, `del(urls)` per page |
-| `uploadTarget` | `issueSignedToken({ pathname: key, operations: ["put"], maximumSizeInBytes, validUntil: now + 15 min })`, then `presignUrl(token, { operation: "put", pathname: key, access: "private", maximumSizeInBytes, allowOverwrite: false })`; returns `{ url, method: "PUT", headers: { "Content-Type": contentType } }` |
+| `uploadTarget` | `issueSignedToken({ pathname: key, operations: ["put"], maximumSizeInBytes, validUntil: now + 15 min })`, then `presignUrl(token, { operation: "put", pathname: key, access: "private", maximumSizeInBytes, allowOverwrite: true, validUntil })` (the uploader reuses the URL when retrying a failed PUT); returns `{ url, method: "PUT", headers: { "Content-Type": contentType } }` |
 | `downloadUrl` | `issueSignedToken({ pathname: key, operations: ["get"], validUntil: now + 15 min })`, then `presignUrl(..., { operation: "get", access: "private" })` |
 
 - `getStore()` selects `BlobStore` for `STORE_DRIVER=blob`, `LocalStore` otherwise.
@@ -103,14 +103,15 @@ const res = await generate({
   mismatch (`NoObjectGeneratedError`), network and 5xx/429 errors. Not retried: HTTP 400, 401, 403, 404.
   `maxRetries: 0` keeps the AI SDK from issuing unrecorded paid retries.
 - **Attempt record** `LlmAttempt`: `ok`, `finishReason`, `inputTokens`, `outputTokens`,
-  `costUsd: number | null`, `costSource: "gateway" | "estimated" | null`, `model` (the resolved
-  provider/model reported by the Gateway, falling back to the requested id), `generationId`, `error`,
-  `raw`. A failed parse still records usage from `NoObjectGeneratedError.usage`.
-- **Cost** per attempt: the cost the Gateway reports for the generation (provider list price, no
-  Gateway markup). Implementation reads it from the response's gateway provider metadata; if the
-  response does not carry it, `gateway.getGenerationInfo({ id: generationId })` supplies `totalCost`.
-  If neither is available, cost = tokens × `PRICING.llmFallback` and `costSource` is `"estimated"`.
-  The first real call confirms which path works; the unit tests cover all three.
+  `costUsd: number`, `costSource: "gateway" | "estimated" | "unknown"`, `model` (the serving
+  `routing.finalProvider/resolvedProviderApiModelId` reported by the Gateway, falling back to the
+  response model id), `generationId`, `error`, `raw`. A failed parse still records usage from
+  `NoObjectGeneratedError.usage`. An attempt with no response records 0 tokens and cost 0.
+- **Cost** per attempt: `providerMetadata.gateway.cost`, a decimal string the Gateway returns with every
+  generation (provider list price, no Gateway markup; confirmed in the AI Gateway docs and the
+  `ai@7.0.105` types). When it is absent (for example `NoObjectGeneratedError`, which carries no
+  provider metadata), cost = tokens × `PRICING.llmFallback` with `costSource: "estimated"`, or 0 with
+  `"unknown"` when the model is not in that table. No separate `getGenerationInfo` call.
 - The schema needs no change: every field is required and optional values are `.nullable()`, which
   both Anthropic and OpenAI strict structured output accept.
 - Stored raw file `raw/claude.json` becomes `raw/llm.json`; the `?raw=1` API key becomes `llm`. There
@@ -125,10 +126,10 @@ Replaces the infrastructure part of original spec §8. Recognition and speech ar
 
 | Old | New |
 |---|---|
-| `claudeModel`, `claudeInputTokens`, `claudeOutputTokens`, `claudeAttempts` | `llmModel`, `llmInputTokens`, `llmOutputTokens`, `llmAttempts`, plus `llmCostUsd`, `llmCostEstimated: boolean` |
+| `claudeModel`, `claudeInputTokens`, `claudeOutputTokens`, `claudeAttempts` | `llmModel`, `llmInputTokens`, `llmOutputTokens`, `llmAttempts`, plus `llmResolvedModel` (string or null), `llmCostUsd`, `llmCostSource` (least reliable source across attempts) |
 | `gcsClassA` | `blobAdvancedOps` (`put`, `list`) |
 | `gcsClassB` | `blobSimpleOps` (`get`, presigned GET fetch) |
-| `egressBytes` | `blobTransferBytes` (one playback of the audio) |
+| `egressBytes` | `blobTransferBytes` (audio read for transcription plus one assumed playback) |
 | `cloudRunRequests` | `fnInvocations` |
 | `cloudRunSeconds` | `fnWallSeconds` (request duration, drives provisioned memory) |
 | — | `fnCpuSeconds` (`process.cpuUsage()` delta over the request, user + system) |
@@ -158,11 +159,13 @@ assumption is stated in `DELIVERY.md`.
 ### 5c. Cost breakdown
 
 - `recognition` = audio minutes × Nova-3.
-- `reasoning` = sum of attempt costs (`llmCostUsd`); marked estimated if any attempt was estimated.
+- `reasoning` = sum of attempt costs (`llmCostUsd`); the UI notes `llmCostSource`.
 - `speech` = 0 (the product does not synthesize speech).
 - `storage` = stored GB × $0.023 × `retentionDays` / 30.
 - `storageOps` = advanced ops × $5/M + simple ops × $0.40/M. `del` is free.
-- `egress` = one playback: audio bytes × (Blob data transfer + Fast Origin Transfer) + one edge request.
+- `storageOps` includes one edge request ($2/M) per simple operation (every blob read is an edge request).
+- `egress` = transfer bytes × (Blob data transfer + Fast Origin Transfer); reads use `useCache: false`
+  or are a first playback, so they miss the CDN cache.
 - `compute` = CPU seconds × $0.128/3600 + wall seconds × 2 GB × $0.0106/3600 + invocations × $0.60/M.
 - Free allowances (Hobby quotas, Gateway free credits) are costed at list price.
 - Hosting reported separately in `DELIVERY.md`: Vercel plan fee, idle cost (0 on Fluid), daily cron
@@ -204,9 +207,11 @@ and "Vercel compute" instead of "Cloud Run compute".
 
 ## 8. Testing
 
-- `tests/lib/extract/llm.test.ts` (replaces `claude.test.ts`): success; truncated then success with both
-  attempts' tokens; two failures preserve usage; 401 not retried; cost from Gateway metadata, from
-  `getGenerationInfo`, and estimated fallback.
+- `tests/lib/extract/llm.test.ts` (replaces `claude.test.ts`): success with Gateway cost and serving
+  provider; estimated cost without Gateway metadata; truncated then success with both attempts' tokens;
+  two failures preserve usage; 401 not retried; 429 retried; unpriced model gives `"unknown"`.
+- `tests/lib/runs/meter.test.ts`: wall and CPU accounting with injected readings (Windows `cpuUsage`
+  resolution is about 15 ms, so no assertion that a measured value is positive).
 - `tests/lib/store/blob.test.ts`: `BlobStore` against a mocked `@vercel/blob` module — overwrite and
   `useCache: false` flags, folded listing with pagination, prefix delete across pages, presigned URL
   options (size cap, operation, expiry).
@@ -227,7 +232,7 @@ and "Vercel compute" instead of "Cloud Run compute".
 |---|---|
 | Presigned Blob PUT blocked by CORS in the browser | Smoke test step 1; fallback `uploadPresigned` + `handleUploadPresigned` |
 | Stale `run.json` read from the CDN breaks stage idempotency | `get(..., { useCache: false })` for every store read |
-| Gateway response does not carry cost | `getGenerationInfo`, then token-price estimate flagged in the UI |
+| Gateway response does not carry cost | Token-price estimate flagged in the UI; the plan's first Gateway ping confirms `gateway.cost` before the eval |
 | Another provider's structured output behaves differently | Schema already strict-mode compatible; eval with `--model` exposes it |
 | Hobby plan is for non-commercial use | Demo only; plan choice and its fee are stated in `DELIVERY.md` |
 | `process.cpuUsage()` over-counts under concurrent requests | Stated as an assumption; demo traffic is sequential |

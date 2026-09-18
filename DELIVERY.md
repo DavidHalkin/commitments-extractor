@@ -59,10 +59,23 @@ scanned for an ISO-BMFF `hdlr` box with handler type `vide`.
 
 ## Time spent
 
-**10.7 hours** measured from 61 commits across 8 sessions (16–18 September 2026), grouping commits
-into sessions with a 45-minute gap and adding 20 minutes of lead-in per session. Realistically
-**12–13 hours**: research, waiting on eval runs and the production debugging left no commits. The
-brief suggested eight. The overrun went into the eval harness, the verifier and the documentation.
+**10.7 hours** measured from 61 commits across 8 sessions, 16–18 September 2026. Method: commits
+grouped into sessions with a 45-minute gap, plus 20 minutes of lead-in each.
+
+| Session | Hours | Work |
+|---|---|---|
+| 16.09 14:57–17:01 | 2.4 | Spec, Next.js scaffold, file checks, limits |
+| 16.09 18:32–19:57 | 1.8 | Store, run records, pipeline |
+| 16.09 23:39–23:50 | 0.5 | Test set: scripts and synthesis |
+| 17.09 14:16–16:42 | 2.8 | AI Gateway, extraction, verifier, eval harness |
+| 17.09 19:12–19:55 | 1.0 | Interface |
+| 17.09 20:56 | 0.3 | Keeping a run alive across pages |
+| 18.09 01:59 | 0.3 | Accuracy: re-segmentation, lexicons, prompt rules |
+| 18.09 12:54–14:06 | 1.5 | Access code, documentation, deployment |
+
+Realistically **12–13 hours**: research, waiting on eval runs and the production debugging left no
+commits. The brief suggested eight. The overrun went into the eval harness, the verifier and the
+documentation — the parts the brief weighs at 80%.
 
 ## Tools, models and what is reused
 
@@ -134,14 +147,19 @@ in API calls plus the $20 seat.
 ## Limits and what I would do next
 
 Scope as briefed: English, two speakers who introduce themselves, audio up to three minutes, no
-accounts, no calendar or task-tracker integration.
+accounts, no calendar or task-tracker integration. This is a working prototype, not a storefront:
+there is no landing page, no sign-up and no billing, and the app opens straight onto the working
+screen.
 
-Not done, in the order I would do it: accept video and extract its audio track instead of rejecting it;
-accept screenshots of chats through a vision model into the same contract; lift the three-minute and
-two-speaker limits, which needs a queue because extraction holds a request for ~55 seconds; accounts
-instead of one shared code; export into a calendar or tracker, without which a commitment stays text.
-There is no rate limiting today — the access code's length is the only thing standing between a script
-and the API credit.
+| Next | Why | Estimate |
+|---|---|---|
+| Accept video, extract the audio track instead of rejecting it | The brief's flow starts with voice **or video**; people bring MP4s from Zoom. `ffmpeg.wasm` in the browser keeps the video off our storage | 1–2 d |
+| Screenshots of chats through a vision model | Half of all commitments are made in writing. Same contract out; the quote becomes a highlighted line and the verifier is reused | 2–3 d |
+| Lift the three-minute and two-speaker limits | Needs a queue first: extraction holds a request for ~55 s, which does not survive hour-long calls | 2–3 d |
+| Rate limiting | Today the access code's length is all that stands between a script and the API credit | 0.5 d |
+| Accounts instead of one shared code | Everyone with the code sees every upload | 1–2 d |
+| Export to a calendar or tracker | Out of scope here, but without it a commitment stays text | 1 d |
+| Automatic recording of calls | The real product: a bot joins from the calendar, nobody uploads anything. Needs everything above, and consent handling that is a product constraint, not fine print | weeks |
 
 More detail: [README.md](README.md) for setup and cost, [docs/how-it-works.md](docs/how-it-works.md)
 for the pipeline, the rejection rules and the retention cron, and `docs/decisions/` for why the model

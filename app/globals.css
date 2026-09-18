@@ -538,6 +538,24 @@ pre {
 .minibar { display: inline-block; width: 72px; height: 10px; border: var(--border-thin); border-radius: var(--radius-pill); background: var(--bg-2); overflow: hidden; }
 .minibar-fill { display: block; height: 100%; background: var(--tone); }
 
+/* ---------- Access code ---------- */
+.login-card { max-width: 30rem; margin: 48px auto; padding: 26px 26px 28px; }
+.login-form { display: grid; gap: 8px; margin-top: 20px; justify-items: start; }
+.login-form label { font-size: var(--text-xs); color: var(--mut); }
+.login-form input {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-family: var(--font-mono-stack);
+  color: inherit;
+  background: var(--bg-2);
+  border: var(--border);
+  border-radius: var(--radius-pill);
+}
+.login-form input:focus-visible { outline: 3px solid var(--tone, var(--ink)); outline-offset: 2px; }
+.login-form .btn { margin-top: 10px; }
+.login-error { color: #c2412a; font-size: var(--text-sm); }
+
 /* ---------- Run page ---------- */
 .run-header { margin-bottom: 22px; padding: 20px 22px; }
 .run-header-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }

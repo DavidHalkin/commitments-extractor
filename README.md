@@ -44,7 +44,20 @@ npm run dev                    # http://localhost:3000
 | `EXTRACT_MODEL` | optional | Any AI Gateway model id; default `openai/gpt-5-mini` |
 | `STORE_DRIVER` | optional | `local` (default, writes to `.data/runs/`) or `blob` |
 | `BLOB_READ_WRITE_TOKEN` | `STORE_DRIVER=blob` outside Vercel | Or run `vercel env pull` |
+| `APP_PASSWORD` | optional | A long access code. Set it and the whole app sits behind a login form; leave it unset and the app is open, as it is by default |
 | `CRON_SECRET` | production | Bearer token Vercel Cron sends to `/api/cron/cleanup` |
+
+### Access code
+
+With `APP_PASSWORD` set, `proxy.ts` (Next 16's name for middleware) stops every request that carries no
+session and sends pages to `/login` and API calls to a `401`. A correct code sets an http-only cookie
+for 30 days holding an HMAC of the code, never the code itself, so changing the code ends every
+session that was handed out under the old one. Two routes stay open by design: `/api/health`, which
+returns nothing but a status, and `/api/cron/cleanup`, which Vercel Cron authenticates with
+`CRON_SECRET` and which would otherwise stop running. What protects you here is the length of the
+code: the comparison is constant-time, but there is no rate limiting — per-instance counters do not
+work on serverless. Against a protected deployment, `npm run smoke` signs in first when `APP_PASSWORD`
+is in its environment.
 
 ## Architecture
 
@@ -57,12 +70,16 @@ upload → file-check → transcribe → precheck → extract → verify
 ```
 
 ```
+proxy.ts            the access-code gate, when APP_PASSWORD is set
 app/
+  login/            the access-code form
+  api/login/        checks the code and issues the session cookie
   api/runs/…        upload target, transcribe, extract, audio, delete
   api/cron/cleanup  daily deletion of runs past their 30-day retention
   components/       upload, progress, timeline, commitment list
   history/          run list and a single run's report
 lib/
+  auth/             access-code gate: session token, public paths
   gate/             file checks and the two-speaker precheck
   stt/              Deepgram call and speaker re-segmentation
   extract/          system prompt, zod schema, Gateway client
@@ -80,7 +97,7 @@ number in the UI can be traced back to what the providers actually returned.
 ## Tests and evaluation
 
 ```bash
-npm test          # 125 unit tests
+npm test          # 146 unit tests
 npm run typecheck
 npm run lint
 npm run eval      # end-to-end against testset/, costs real API calls
@@ -125,5 +142,6 @@ the eval back to back. Every number above is a list price, with free credit deli
 ## Limits
 
 Audio only (video is rejected), 1 KB to 35 MB, 3 seconds to 3 minutes, exactly two speakers who say
-their names. Runs are deleted 30 days after they are created. Uploads are visible to anyone who opens
-the deployment — there are no accounts.
+their names. Runs are deleted 30 days after they are created. There are no accounts: everyone who
+reaches the app — everyone with the access code, or everyone at all when none is set — sees the same
+uploads.

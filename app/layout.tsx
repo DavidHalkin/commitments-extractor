@@ -3,6 +3,7 @@ import { Fredoka, Inter } from "next/font/google";
 import Link from "next/link";
 import { HeaderRunBadge } from "@/app/components/HeaderRunBadge";
 import { RunSessionProvider } from "@/app/components/RunSession";
+import { appPassword } from "@/lib/auth/gate";
 import "./globals.css";
 
 const displayFont = Fredoka({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
@@ -27,7 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <HeaderRunBadge />
               </nav>
             </div>
-            <p className="notice">Uploads are visible to everyone who opens this demo and are deleted after 30 days.</p>
+            <p className="notice">
+              {appPassword()
+                ? "Uploads are visible to everyone who has the access code and are deleted after 30 days."
+                : "Uploads are visible to everyone who opens this demo and are deleted after 30 days."}
+            </p>
           </header>
           <main className="page">{children}</main>
         </RunSessionProvider>

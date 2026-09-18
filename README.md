@@ -11,6 +11,11 @@ work.
 
 Scope: one language (English), two speakers who introduce themselves, audio up to 3 minutes.
 
+[![Demo video: a walkthrough of the app and how it works](docs/assets/demo-video.jpg)](https://www.youtube.com/watch?v=TRV-3VGNwy8)
+
+**[▶ Watch the demo on YouTube](https://www.youtube.com/watch?v=TRV-3VGNwy8)**: the full presentation of
+the app and how it works.
+
 **[DELIVERY.md](DELIVERY.md)** is the submission summary: sample inputs with expected against actual
 results, what failed, time spent, the exact models and one worked example of how their output was
 checked, and the measured speed and cost.

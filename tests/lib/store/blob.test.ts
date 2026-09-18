@@ -69,6 +69,12 @@ describe("BlobStore", () => {
     );
   });
 
+  it("uploads to the exact key, because presigned uploads add a random suffix by default", async () => {
+    await store.uploadTarget("runs/x/audio", "audio/mpeg", 1024);
+    const options = vi.mocked(blob.presignUrl).mock.calls[0][1] as { addRandomSuffix?: boolean };
+    expect(options.addRandomSuffix).toBe(false);
+  });
+
   it("issues a presigned GET for playback that expires within 15 minutes", async () => {
     const before = Date.now();
     expect(await store.downloadUrl("runs/x/audio")).toBe("https://blob.example/signed");

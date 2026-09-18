@@ -53,6 +53,9 @@ export class BlobStore implements ObjectStore {
       maximumSizeInBytes: maxBytes,
       // The browser reuses this URL when it retries a failed upload.
       allowOverwrite: true,
+      // Presigned uploads default to a random suffix, which would store the audio next to the key
+      // every reader asks for instead of at it.
+      addRandomSuffix: false,
       validUntil,
     });
     return { url: presignedUrl, method: "PUT", headers: { "Content-Type": contentType } };

@@ -52,3 +52,6 @@ todo.md
 
 # gstack browse daemon state
 .gstack/
+
+# client brief, kept out of the public repository
+TS.md

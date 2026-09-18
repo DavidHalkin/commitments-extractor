@@ -143,6 +143,11 @@ two cents. Prices are in `lib/pricing.ts` with their sources and the date they w
 500 extractions, but its per-model rate limit — not the credit — is what you hit first when running
 the eval back to back. Every number above is a list price, with free credit deliberately ignored.
 
+Every account behind this project is on free credit today, and Hobby is licensed for personal,
+non-commercial use, so a client-facing deployment belongs on Pro. The per-audio-minute breakdown,
+Hobby against Pro, what each free tier covers and what a full move to GCP would cost are in
+[docs/how-it-works.md](docs/how-it-works.md#what-it-costs).
+
 ## Limits
 
 Audio only (video is rejected), 1 KB to 35 MB, 3 seconds to 3 minutes, exactly two speakers who say

@@ -11,6 +11,8 @@ does what.
 - [Retention and the daily cron](#retention-and-the-daily-cron)
 - [Access code](#access-code)
 - [What it costs](#what-it-costs)
+- [What we actually pay today](#what-we-actually-pay-today)
+- [Moving to GCP](#moving-to-gcp)
 - [What the project uses](#what-the-project-uses)
 
 ## The path of one recording
@@ -139,10 +141,108 @@ The rules, the cookie and the two routes that stay public are described in the
 
 ## What it costs
 
-One 75-second recording costs about **$0.015** end to end, roughly **$15 per 1,000 recordings**, and
-the app itself fits Vercel's Hobby plan at $0/month. The measured breakdown, the hosting rates and the
-note about free credit are in the [README](../README.md#cost). Synthesizing the test set is a separate
-one-time $0.0714, and `npm run smoke` costs nothing because it never calls a paid API.
+### One minute of audio, end to end
+
+Measured, not estimated: the per-recording numbers come from `eval/results/20260917T225133Z.md` and a
+stored deployed-shape run, divided by their audio length.
+
+| Step | Per audio minute | Where the number comes from |
+|---|---|---|
+| Generating the audio (Aura-2 TTS) | **$0.0225** | Only for synthetic test material. 2,379 characters produced 3.17 minutes of speech, about 750 characters a minute at $0.03 per 1,000 |
+| Transcription (Deepgram nova-3) | **$0.0043** | List price per audio minute |
+| Processing (gpt-5-mini via AI Gateway) | **$0.0072** | $0.0091 measured on a 75.6 s recording. It follows the transcript, not the clock, so a dense minute costs more than a quiet one |
+| Hosting per run (functions, Blob, egress) | **$0.0006** | Storage, operations, egress and function time measured on one run: $0.00077 for 75.6 s |
+| **A real upload** | **~$0.0121** | Everything except the TTS, which only test recordings need |
+| **A synthesized minute** | **~$0.0346** | The same, plus Aura-2 |
+
+So a real one-minute recording costs about **1.2 cents**, and 1,000 of them about **$12**. Generating a
+minute of test audio costs roughly twice as much as processing it.
+
+### Hosting: Hobby versus Pro
+
+| | Hobby | Pro |
+|---|---|---|
+| Plan fee | $0 | $20 per seat per month, including $20 of usage credit |
+| Functions | 4 active-CPU hours included | Past the credit, $0.128 per active-CPU-hour plus $0.0106 per GB-hour of provisioned memory |
+| Blob storage | 1 GB included | $0.023 per GB-month |
+| Edge requests | 1M included | 10M included, then $2 per million |
+| Fast data transfer | 100 GB included | 1 TB included, then $0.15 per GB |
+| Allowed use | Personal, non-commercial | Commercial |
+
+This workload is small against those allowances: one run spends 0.33 s of active CPU and stores about
+1 MB for 30 days. The Hobby function allowance alone covers tens of thousands of runs, and its 1 GB of
+Blob holds roughly a thousand recordings at a time. The reason to move to Pro is the licence rather
+than the meter: Hobby is for personal, non-commercial projects, so a client-facing deployment belongs
+on Pro, where the $20 fee arrives with $20 of usage credit this workload will not exhaust.
+
+Synthesizing the whole test set is a separate one-time $0.0714, and `npm run smoke` costs nothing
+because it never calls a paid API.
+
+## What we actually pay today
+
+**Nothing. Every account behind this project is running on free credit,** and it is worth being precise
+about what that hides.
+
+| Account | What is free | Measured state | What happens when it ends |
+|---|---|---|---|
+| Vercel Hobby | The plan and the allowances above | Far below every limit | Nothing stops. The licence, not the meter, is what forces Pro at $20 per seat per month |
+| Vercel AI Gateway | $5 of credit a month | $4.74 of $5 left on 2026-09-18 | The credit covers about 550 extractions a month; after that $0.0072 per audio minute at the provider's list price, with no markup |
+| Deepgram | $200 credit on a new account | Running on it | It covers about 46,500 audio minutes of nova-3; after that $0.0043 a minute |
+
+The honest version: at this volume the credit is not the constraint — **the free tier's per-model rate
+limit is**. Running the eval back to back already fails, with the model refusing requests, which is why
+`--pause=30` exists. When the credits end, a thousand one-minute recordings cost about **$12 in API
+calls plus $20 a month for the Pro seat**, and not a line of the code changes.
+
+## Moving to GCP
+
+Nothing in the pipeline is tied to Vercel except two seams, and both are already abstracted:
+`ObjectStore` (`lib/store/`) and the two API routes the browser calls.
+
+| Now | On GCP | Notes |
+|---|---|---|
+| Vercel Functions | Cloud Run service, container built from this repo | Next.js runs unchanged; `next start` behind Cloud Run |
+| Vercel Blob | Cloud Storage bucket plus a `GcsStore` implementing `ObjectStore` | The interface already has `put`, `get`, `listDirs`, `deletePrefix`, `uploadTarget`, `downloadUrl`, and GCS signed URLs map onto the last two one to one |
+| Vercel Cron | Cloud Scheduler calling the same `/api/cron/cleanup` with the same bearer token | Or a bucket lifecycle rule that deletes objects older than 30 days, which removes the endpoint altogether |
+| AI Gateway | Keep it, call the provider directly, or move to Vertex AI | The Gateway is reachable from anywhere; only Vertex changes the model and its prices, so re-check them at the time |
+| Deepgram | Unchanged | It is an HTTP API and knows nothing about the host |
+| Environment variables | Secret Manager | Same names |
+
+**What it would cost.** Tier 1 / us-central1, checked on 2026-09-18.
+
+| Resource | Price | This workload |
+|---|---|---|
+| Cloud Run, request-based | $0.000024 per vCPU-second, $0.0000025 per GiB-second, $0.40 per million requests | About 0.33 CPU-seconds and 3 requests per run — well under a hundredth of a cent, and the always-free tier (180,000 vCPU-seconds, 360,000 GiB-seconds and 2M requests a month) absorbs it entirely |
+| Cloud Storage Standard | $0.022 per GB-month; class A $0.05 per 1,000 operations, class B $0.004 per 10,000 | 1 MB for 30 days is $0.000022 a run, marginally cheaper than Blob |
+| Cloud Scheduler | 3 jobs free a month | The cleanup job is free |
+| Internet egress | Per Network Service Tiers | About 2 MB a run; check the current rate before quoting one |
+
+The API costs do not move at all — they are Deepgram and the model, not the platform — and the platform
+costs go from small to smaller, with no seat fee. The real trade is elsewhere: Vercel hands this app
+preview deployments, a CDN and a cron for nothing, and on GCP you assemble them yourself.
+
+**What scaling actually needs.** At this size neither platform is under strain. What gives way first,
+in order:
+
+1. **Provider rate limits**, which belong to Deepgram and the model, not to the host. Concurrency has
+   to be bounded before anything else matters, on either platform.
+2. **The extract stage holds a request open for about 55 seconds.** Fine while a person watches a
+   progress bar, useless for batching. Past a handful of concurrent uploads this belongs in a queue —
+   Cloud Tasks or Pub/Sub with a Cloud Run worker, the browser polling the run instead of holding the
+   call open. The same shape is needed on Vercel.
+3. **Storage growth**, which retention already bounds; a bucket lifecycle rule enforces it without any
+   code at all.
+4. **Cold starts.** Cloud Run charges by the hour for `min-instances` to avoid them; Vercel's fluid
+   compute hides them. Only worth paying for once there is real traffic.
+
+Recommendation: stay on Vercel while this is a demo — the free tier and the ops work you do not have to
+do are worth more than the fraction of a cent per run that GCP would save. Move when the app needs a
+queue, processing longer than a request, or data residency. When that day comes the only new code is
+`GcsStore` and a worker entry point.
+
+Prices above: [Vercel](https://vercel.com/pricing), [Deepgram](https://deepgram.com/pricing),
+[Cloud Run](https://cloud.google.com/run/pricing), [Cloud Storage](https://cloud.google.com/storage/pricing).
+The per-unit rates the app bills itself with live in `lib/pricing.ts` with their own `checkedAt` date.
 
 ## What the project uses
 

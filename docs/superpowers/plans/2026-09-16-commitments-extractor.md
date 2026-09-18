@@ -101,7 +101,7 @@ README.md, DELIVERY.md, eval/results/*
 - [ ] **Step 1: Scaffold Next.js into a temporary folder and move it to the repo root**
 
 ```bash
-cd E:/freelance/codebridge_test
+cd <repo root>
 npx create-next-app@latest scaffold --ts --eslint --app --no-tailwind --no-src-dir --import-alias "@/*" --use-npm --disable-git --yes
 cp -r scaffold/. . && rm -rf scaffold
 npm install @anthropic-ai/sdk zod file-type music-metadata @google-cloud/storage

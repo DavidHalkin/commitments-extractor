@@ -11,6 +11,10 @@ work.
 
 Scope: one language (English), two speakers who introduce themselves, audio up to 3 minutes.
 
+**[DELIVERY.md](DELIVERY.md)** is the submission summary: sample inputs with expected against actual
+results, what failed, time spent, the exact models and one worked example of how their output was
+checked, and the measured speed and cost.
+
 **[docs/how-it-works.md](docs/how-it-works.md)** walks the whole thing end to end: the six stages of a
 run, how the test recordings are made and what they cost, every rule that rejects an upload, what the
 daily cron deletes, and what each package is for.
